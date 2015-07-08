@@ -1,0 +1,35 @@
+#
+#  Makefile for pypppack
+#
+.SUFFIXES: .o .f90 .F90 
+
+include ../Makefile.inc
+
+CUR_DIR = $(CUR_PROJ)/src/pppack
+REP_SRC = $(CUR_DIR)
+
+LIB =  -lpppack
+PY_FILES = pppack.py
+
+all : PY
+	
+PY:	
+	$(FTOPY) $(FTOPYFLAGS) pypppack.F90 $(INCLUDE) $(LIB_DIR) $(LIB)  -m pypppack
+	@$(CP) *.so $(REP_BIN)/
+	@$(CP) *.so $(REP_INSTALL)
+	@$(CP) $(PY_FILES) $(REP_INSTALL)
+
+cppy:
+	@$(CP) $(PY_FILES) $(REP_INSTALL)	
+	
+clean:	
+	@( cd $(REP_SRC)/; rm -f *.o *~ *.mod *.so *.pyc)		
+	@rm -f $(REP_SRC)/*.o $(REP_SRC)/*~ $(REP_SRC)/*.mod
+
+debug:	
+	make lib -f Makefile F90FLAGS=-g3 FFLAGS=-g3
+
+lib: $(LIB_OBJECTS)
+	@ar crv $(LIB_OUT) $(LIB_OBJECTS)
+	@cp *.mod $(REP_MOD)
+
