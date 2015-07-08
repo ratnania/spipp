@@ -24,6 +24,7 @@ IMPLICIT NONE
 
     ! ... basis type 
     INTEGER, PARAMETER  :: SPI_BASIS_BSPLINES        = 1 ! B-Splines 
-    INTEGER, PARAMETER  :: SPI_BASIS_FOURIER         = 2 ! fourier
+    INTEGER, PARAMETER  :: SPI_BASIS_HBEZIER         = 2 ! Hermite-Bezier 
+    INTEGER, PARAMETER  :: SPI_BASIS_FOURIER         = 3 ! fourier
 
 END MODULE SPI_GLOBAL_DEF

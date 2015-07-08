@@ -80,6 +80,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SPLINES_BUILD_DIR}/lib)
 SET(SPIPP_GLOBAL_DIR        ${PROJECT_SOURCE_DIR}/fortran/global)
 SET(SPIPP_QUADRATURES_DIR   ${PROJECT_SOURCE_DIR}/fortran/quadratures)
 SET(SPIPP_BSPLINE_DIR       ${PROJECT_SOURCE_DIR}/fortran/bspline)
+SET(SPIPP_BLACKBOX_DIR      ${PROJECT_SOURCE_DIR}/fortran/blackbox)
 
 enable_language (Fortran)
 

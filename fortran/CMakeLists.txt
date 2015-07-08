@@ -27,16 +27,16 @@ add_subdirectory(quadratures)
 ##########################################################################
 
 ##########################################################################
-#add_subdirectory(space)
+add_subdirectory(blackbox)
 #IF(BUILD_TESTS)
-#   add_subdirectory(space/tests)
+#   add_subdirectory(blackbox/tests)
 #ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
-#add_subdirectory(blackbox)
+#add_subdirectory(space)
 #IF(BUILD_TESTS)
-#   add_subdirectory(blackbox/tests)
+#   add_subdirectory(space/tests)
 #ENDIF(BUILD_TESTS)
 ##########################################################################
 
