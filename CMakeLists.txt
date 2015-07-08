@@ -77,6 +77,10 @@ file(MAKE_DIRECTORY ${SPLINES_BUILD_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SPLINES_BUILD_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SPLINES_BUILD_DIR}/lib)
 
+SET(SPIPP_GLOBAL_DIR        ${PROJECT_SOURCE_DIR}/fortran/global)
+SET(SPIPP_QUADRATURES_DIR   ${PROJECT_SOURCE_DIR}/fortran/quadratures)
+SET(SPIPP_BSPLINE_DIR       ${PROJECT_SOURCE_DIR}/fortran/bspline)
+
 enable_language (Fortran)
 
 # Define folder to be deleted by make clean         
@@ -120,13 +124,13 @@ ENDIF(BUILD_LIBRARY)
 #ENDIF(BUILD_SIMULATIONS) 
 
 # python 
-IF(BUILD_PACKAGE)
-   add_subdirectory(python)
-ENDIF(BUILD_PACKAGE) 
-
-IF(FORTRANCL_ENABLED)
-   ADD_SUBDIRECTORY(opencl)
-ENDIF(FORTRANCL_ENABLED)
+#IF(BUILD_PACKAGE)
+#   add_subdirectory(python)
+#ENDIF(BUILD_PACKAGE) 
+#
+#IF(FORTRANCL_ENABLED)
+#   ADD_SUBDIRECTORY(opencl)
+#ENDIF(FORTRANCL_ENABLED)
 ##########################################################################
 
 

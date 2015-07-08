@@ -14,13 +14,13 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(global)
-IF(BUILD_TESTS)
-   add_subdirectory(global/tests)
-ENDIF(BUILD_TESTS)
+#IF(BUILD_TESTS)
+#   add_subdirectory(global/tests)
+#ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
-#add_subdirectory(quadratures)
+add_subdirectory(quadratures)
 #IF(BUILD_TESTS)
 #   add_subdirectory(quadratures/tests)
 #ENDIF(BUILD_TESTS)
