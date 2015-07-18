@@ -27,4 +27,10 @@ IMPLICIT NONE
     INTEGER, PARAMETER  :: SPI_BASIS_HBEZIER         = 2 ! Hermite-Bezier 
     INTEGER, PARAMETER  :: SPI_BASIS_FOURIER         = 3 ! fourier
 
+    ! ... boundary conditions
+    INTEGER, PARAMETER  :: SPI_BC_DIRICHLET_HOMOGEN  = 0 
+    INTEGER, PARAMETER  :: SPI_BC_PERIODIC           = 1	
+    INTEGER, PARAMETER  :: SPI_BC_NO                 = 2
+
+
 END MODULE SPI_GLOBAL_DEF

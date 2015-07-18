@@ -81,6 +81,9 @@ SET(SPIPP_GLOBAL_DIR        ${PROJECT_SOURCE_DIR}/fortran/global)
 SET(SPIPP_QUADRATURES_DIR   ${PROJECT_SOURCE_DIR}/fortran/quadratures)
 SET(SPIPP_BSPLINE_DIR       ${PROJECT_SOURCE_DIR}/fortran/bspline)
 SET(SPIPP_BLACKBOX_DIR      ${PROJECT_SOURCE_DIR}/fortran/blackbox)
+SET(SPIPP_BASIS_DIR         ${PROJECT_SOURCE_DIR}/fortran/basis)
+SET(SPIPP_MESH_DIR          ${PROJECT_SOURCE_DIR}/fortran/mesh)
+SET(SPIPP_MATRIX_DIR        ${PROJECT_SOURCE_DIR}/fortran/matrix)
 
 enable_language (Fortran)
 
