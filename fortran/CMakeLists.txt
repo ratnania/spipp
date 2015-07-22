@@ -56,9 +56,9 @@ add_subdirectory(blackbox)
 
 ##########################################################################
 add_subdirectory(sparse_matrix)
-#IF(BUILD_TESTS)
-#   add_subdirectory(sparse_matrix/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(sparse_matrix/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################

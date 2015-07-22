@@ -319,12 +319,87 @@ CONTAINS
       
    end subroutine init_SparseMatrix	
    ! ...................................................
+
+   ! ...................................................
+   subroutine mult_csr_matrix_vector(self,apr_x,apr_y)
+   implicit none
+      type(DEF_MATRIX_CSR) :: self
+      real(SPI_RK),dimension(:) :: apr_x
+      real(SPI_RK),dimension(:) :: apr_y  
+      !local var
+      integer  :: li_i, li_k_1, li_k_2		
+      
+      apr_y = 0.0
+      do li_i = 1, self%oi_nR
+         li_k_1 = self%opi_ia ( li_i )
+         li_k_2 = self%opi_ia ( li_i + 1 ) - 1			
+         
+         apr_y ( li_i ) = DOT_PRODUCT ( self%opr_a ( li_k_1 : li_k_2 ), apr_x ( self%opi_ja ( li_k_1 : li_k_2 ) ) )
+      end do
+      
+   end subroutine mult_csr_matrix_vector
+   ! ...................................................
+
+   ! ...................................................
+   subroutine add_csr_matrix_value ( self, ar_value, ai_A, ai_Aprime )	
+   implicit none
+      type(DEF_MATRIX_CSR) :: self
+      real(SPI_RK) :: ar_value
+      integer  :: ai_A, ai_Aprime
+      !local var
+      integer :: li_result, li_i, li_j, li_k
+      
+      li_result = 0
+      
+      ! THE CURRENT LINE IS self%opi_ia(ai_A)
+      do li_k = self%opi_ia(ai_A),self%opi_ia(ai_A+1)-1
+         li_j = self%opi_ja(li_k)
+         if ( li_j == ai_Aprime ) then
+            self%opr_a(li_k) = self%opr_a(li_k) + ar_value
+            exit
+         end if
+      end do	
+      
+   end subroutine add_csr_matrix_value
+   ! ...................................................
+
+   ! ...................................................
+   subroutine add_csr_matrix_csr_matrix ( self, ao_csr )	
+   implicit none
+      type(DEF_MATRIX_CSR) :: self, ao_csr
+      
+      self%opr_a = self%opr_a + ao_csr%opr_a
+      
+   end subroutine add_csr_matrix_csr_matrix	
+   ! ...................................................
+   
+   ! ...................................................
+   subroutine save_csr_matrix_mm_format(self, as_file)
+   implicit none
+      type(DEF_MATRIX_CSR) :: self 
+      character(len=*), intent(in) :: as_file		
+      !local var
+      integer  :: li_i,li_j,li_k	
+      integer  :: li_file=1
+      integer  :: li_ios
+
+      open(unit=li_file, file=TRIM(as_file), iostat=li_ios)
+      if (li_ios/=0) STOP "print_nnz_csrMatrix : erreur d'ouverture du fichier "
+              
+      write(li_file, *)'%%MatrixMarket matrix coordinate real general'
+      write(li_file, *)self%oi_nR,',',self%oi_nC,',',self%oi_nel
+
+      do li_i =1,self%oi_nR 
+         do li_k = self%opi_ia(li_i),self%opi_ia(li_i+1)-1
+            li_j = self%opi_ja(li_k)
+
+            write(li_file, *)li_i,',',li_j,',',self%opr_a(li_k)		
+         end do
+      end do	
+
+      close(li_file)
+
+   end subroutine save_csr_matrix_mm_format
+   ! ...................................................
        
 END MODULE SPI_CSR_MATRIX_MODULE
-            
-            
-         
-      
-      
-      
-   

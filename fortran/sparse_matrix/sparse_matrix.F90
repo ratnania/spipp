@@ -68,16 +68,115 @@ CONTAINS
 
    END SUBROUTINE free_sparse_matrix
    ! ...................................................   
+
+   ! ...................................................
+   subroutine mult_sparse_matrix_vector(self, apr_x, apr_y)
+   implicit none
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      real(SPI_RK),dimension(:) :: apr_x
+      real(SPI_RK),dimension(:) :: apr_y  
+      ! LOCAL
+
+      ! ...
+      SELECT TYPE (self)
+      CLASS IS (DEF_MATRIX_CSR)
+         CALL mult_csr_matrix_vector(self, apr_x, apr_y) 
+     
+      CLASS IS (DEF_MATRIX_BND)
+         STOP "mult_sparse_matrix_vector: not yet implemented"
+     
+      CLASS DEFAULT
+         STOP 'mult_sparse_matrix_vector: unexpected type for self object!'
+      END SELECT
+      ! ...
+      
+   end subroutine mult_sparse_matrix_vector
+   ! ...................................................
+
+   ! ...................................................
+   subroutine add_sparse_matrix_value ( self, ar_value, ai_A, ai_Aprime )	
+   implicit none
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      real(SPI_RK) :: ar_value
+      integer  :: ai_A, ai_Aprime
+      ! LOCAL
+
+      ! ...
+      SELECT TYPE (self)
+      CLASS IS (DEF_MATRIX_CSR)
+         CALL add_csr_matrix_value(self, ar_value, ai_A, ai_Aprime) 
+     
+      CLASS IS (DEF_MATRIX_BND)
+         STOP "add_sparse_matrix_value: not yet implemented"
+     
+      CLASS DEFAULT
+         STOP 'add_sparse_matrix_value: unexpected type for self object!'
+      END SELECT
+      ! ...
+      
+   end subroutine add_sparse_matrix_value
+   ! ...................................................
+
+   ! ...................................................
+   subroutine add_sparse_matrix_sparse_matrix ( self, other)	
+   implicit none
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: other 
+      
+      ! ...
+      SELECT TYPE (self)
+      CLASS IS (DEF_MATRIX_CSR)
+         SELECT TYPE (other)
+         CLASS IS (DEF_MATRIX_CSR)
+            CALL add_csr_matrix_csr_matrix(self, other) 
+        
+         CLASS IS (DEF_MATRIX_BND)
+            STOP 'add_sparse_matrix_sparse_matrix: unexpected type for other object!'
+        
+         CLASS DEFAULT
+            STOP 'add_sparse_matrix_sparse_matrix: unexpected type for self object!'
+         END SELECT
+     
+      CLASS IS (DEF_MATRIX_BND)
+         STOP "add_sparse_matrix_sparse_matrix: not yet implemented"
+     
+      CLASS DEFAULT
+         STOP 'add_sparse_matrix_sparse_matrix: unexpected type for self object!'
+      END SELECT
+      ! ...
+      
+   end subroutine add_sparse_matrix_sparse_matrix
+   ! ...................................................
+   
+   ! ...................................................
+   subroutine save_sparse_matrix(self, as_file, ai_format)
+   implicit none
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      character(len=*), intent(in) :: as_file		
+      integer, intent(in) :: ai_format
+      ! LOCAL
+
+      ! ...
+      SELECT TYPE (self)
+      CLASS IS (DEF_MATRIX_CSR)
+         IF (ai_format == SPI_MATRIX_OUTPUT_FORMAT_MM) THEN
+            CALL save_csr_matrix_mm_format(self, as_file)
+         ELSE
+            STOP "save_sparse_matrix: format not yet supported"
+         END IF
+     
+      CLASS IS (DEF_MATRIX_BND)
+         STOP "save_sparse_matrix: not yet implemented"
+     
+      CLASS DEFAULT
+         STOP 'save_sparse_matrix: unexpected type for self object!'
+      END SELECT
+      ! ...
+
+   end subroutine save_sparse_matrix
+   ! ...................................................
+
    
    ! ...................................................
 
 END MODULE SPI_SPARSE_MATRIX
-      
-      
-      
-      
-      
-      
-
-      
-      

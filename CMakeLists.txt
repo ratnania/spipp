@@ -58,6 +58,7 @@ SET(FORTRANCL_ENABLED     OFF CACHE BOOL "Enable OpenCL test programs")
 #	CACHE STRING "this variable gives a name to a configuration/build. Configure uses this value to stores the generated config makefiles in PETSC_DIR/PETSC_ARCH/conf.")
 
 INCLUDE(FortranConfig)
+INCLUDE(LapackConfig)
 INCLUDE(CTest)
 
 FIND_PACKAGE(PythonInterp 2.7.3)
