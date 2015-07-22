@@ -21,7 +21,7 @@ MODULE SPI_BASIS_FOURIER
   PUBLIC :: CREATE_BASIS_1D_FOURIER, RESET_BASIS_1D_FOURIER, UPDATE_BASIS_1D_FOURIER
 
   INTEGER :: n_tor
-  INTEGER :: n_plane
+  INTEGER :: n_plan
   INTEGER :: n_period
   INTEGER :: ierror
 
@@ -40,11 +40,9 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE RESET_BASIS_1D_FOURIER(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE RESET_BASIS_1D_FOURIER(self)
     IMPLICIT NONE
      CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
-     INTEGER, INTENT(IN)       :: ai_elmt_id
 
    END SUBROUTINE RESET_BASIS_1D_FOURIER
    ! ...................................................
@@ -68,16 +66,15 @@ CONTAINS
      INTEGER :: li_err
 
      ao_mesh % oi_n_vtex_per_elmt     = 1
-     ao_mesh % oi_n_max_vtex_per_elmt = 1
 
-     CALL JOREK_Param_GETInt(INT_N_TOR_ID,n_tor,li_err)
-     CALL JOREK_Param_GETInt(INT_N_PLANE_ID,n_plane,li_err)
-     CALL JOREK_Param_GETInt(INT_N_PERIOD_ID,n_period,li_err)
+     ! ... TODO to set
+     n_tor    = SPI_INT_DEFAULT 
+     n_plan   = SPI_INT_DEFAULT
+     n_period = SPI_INT_DEFAULT
+     ! ...
 
      self % oi_n_order     = n_tor
      self % oi_n_max_order = n_tor
-
-     ao_mesh % oi_n_order             = self % oi_n_order
 
     END SUBROUTINE Init_FE_BasisF1D_Parameters
    ! ...................................................
@@ -89,7 +86,7 @@ CONTAINS
      CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
     ! LOCAL
     INTEGER       :: iv, jv, ig, il
-    REAL(KIND=RK) :: s , t, phi
+    REAL(KIND=SPI_RK) :: s , t, phi
     INTEGER :: mode(n_tor) 
 
      ALLOCATE(self % TestfT_0 (ao_mesh % ptr_quad % oi_n_points, self % oi_n_order, ao_mesh % oi_n_vtex_per_elmt))

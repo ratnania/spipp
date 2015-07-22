@@ -2,7 +2,6 @@
 MODULE SPI_BLACKBOX_DEF
   USE SPI_GLOBAL_DEF
   USE SPI_QUADRATURES_DEF
-!  USE SPI_BASIS_DEF
 
 ! ..........................................................        
   TYPE, PUBLIC :: DEF_BLACKBOX_1D

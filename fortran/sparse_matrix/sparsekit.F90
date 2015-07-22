@@ -1,5 +1,4 @@
       MODULE SPI_SPARSEKIT
-      IMPLICIT NONE
       CONTAINS
 
 ! ...................................................

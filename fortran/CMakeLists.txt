@@ -20,6 +20,13 @@ add_subdirectory(global)
 ##########################################################################
 
 ##########################################################################
+add_subdirectory(utilities)
+#IF(BUILD_TESTS)
+#   add_subdirectory(utilities/tests)
+#ENDIF(BUILD_TESTS)
+##########################################################################
+
+##########################################################################
 add_subdirectory(quadratures)
 #IF(BUILD_TESTS)
 #   add_subdirectory(quadratures/tests)
@@ -48,7 +55,14 @@ add_subdirectory(blackbox)
 ##########################################################################
 
 ##########################################################################
-add_subdirectory(matrix)
+add_subdirectory(sparse_matrix)
+#IF(BUILD_TESTS)
+#   add_subdirectory(sparse_matrix/tests)
+#ENDIF(BUILD_TESTS)
+##########################################################################
+
+##########################################################################
+#add_subdirectory(matrix)
 #IF(BUILD_TESTS)
 #   add_subdirectory(matrix/tests)
 #ENDIF(BUILD_TESTS)

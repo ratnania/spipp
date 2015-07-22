@@ -4,7 +4,7 @@ MODULE SPI_BASIS_DEF
   USE SPI_QUADRATURES_DEF
   IMPLICIT NONE
   
-  INTEGER :: n_deriv=AnyI
+  INTEGER :: n_deriv=SPI_INT_DEFAULT
 
 ! ..........................................................        
   TYPE, ABSTRACT, PUBLIC :: DEF_BASIS_ABSTRACT
@@ -21,15 +21,24 @@ MODULE SPI_BASIS_DEF
 
 ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_ABSTRACT) :: DEF_BASIS_1D
-     REAL(KIND=RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_0
-     REAL(KIND=RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_p, TestfT_pp 
+     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_0
+     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_p, TestfT_pp 
   END TYPE DEF_BASIS_1D
 ! ..........................................................        
 
+! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_BSPLINES
   END TYPE DEF_BASIS_1D_BSPLINES
+! ..........................................................        
 
+! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_FOURIER
   END TYPE DEF_BASIS_1D_FOURIER
+! ..........................................................        
+
+! ..........................................................        
+  TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_HBEZIER
+  END TYPE DEF_BASIS_1D_HBEZIER
+! ..........................................................        
 
 END MODULE SPI_BASIS_DEF

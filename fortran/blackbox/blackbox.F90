@@ -17,7 +17,7 @@ MODULE SPI_BLACKBOX
 
     self % oi_n_points   = ao_quad % oi_n_points
     ! TODO : update subroutine's signature 
-    self % oi_basis_type = SPI_BASIS_BSPLINES 
+    self % oi_basis_type = SPI_INT_BASIS_BSPLINES 
 
     ALLOCATE(self%B_0    (ao_quad % oi_n_points))
 
@@ -106,7 +106,7 @@ MODULE SPI_BLACKBOX
        self % Vol(kg) = ABS( ar_b - ar_a )
       
        SELECT CASE(self % oi_basis_type)
-          CASE(SPI_BASIS_FOURIER) 
+          CASE(SPI_INT_BASIS_FOURIER) 
              Nutor(1) = 1 
              Nutor(2) = 1
              self % Vol(kg) = 1.0
@@ -145,12 +145,12 @@ MODULE SPI_BLACKBOX
     INTEGER  :: li_err
 
     SELECT CASE(self % oi_basis_type)
-    CASE(SPI_BASIS_BSPLINES) 
+    CASE(SPI_INT_BASIS_BSPLINES) 
        ! TODO to check
        self % Xp_0(1,:)   = ar_a + self % ptr_quad % opr_points(1,:) * (ar_b - ar_a )
-    CASE(SPI_BASIS_HBEZIER) 
+    CASE(SPI_INT_BASIS_HBEZIER) 
        self % Xp_0(1,:)   = ar_a + self % ptr_quad % opr_points(1,:) * (ar_b - ar_a )
-    CASE(SPI_BASIS_FOURIER) 
+    CASE(SPI_INT_BASIS_FOURIER) 
        self % Xp_0(1,:)   =  self % ptr_quad % opr_points(1,:)
     END SELECT
 

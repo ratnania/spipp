@@ -13,7 +13,6 @@
 !* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 MODULE SPI_BASIS_BSPLINES 
   USE SPI_BASIS_DEF
-  USE SPI_FOURIER_MODS
   USE SPI_MESH_DEF
 
   IMPLICIT NONE
@@ -26,7 +25,7 @@ CONTAINS
    ! ...................................................
    SUBROUTINE CREATE_BASIS_1D_BSPLINES(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_BSPLINES), INTENT(INOUT) :: self
      CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
 
      CALL Init_FE_BasisF1D_Parameters(self, ao_mesh)
@@ -36,11 +35,9 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE RESET_BASIS_1D_BSPLINES(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE RESET_BASIS_1D_BSPLINES(self)
     IMPLICIT NONE
-     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
-     INTEGER, INTENT(IN)       :: ai_elmt_id
+     CLASS(DEF_BASIS_1D_BSPLINES), INTENT(INOUT) :: self
 
    END SUBROUTINE RESET_BASIS_1D_BSPLINES
    ! ...................................................
@@ -48,7 +45,7 @@ CONTAINS
    ! ...................................................
    SUBROUTINE UPDATE_BASIS_1D_BSPLINES(self, ao_mesh, ai_elmt_id)
     IMPLICIT NONE
-     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_BSPLINES), INTENT(INOUT) :: self
      CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
      INTEGER, INTENT(IN)       :: ai_elmt_id
 
@@ -56,29 +53,24 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE Init_FE_BasisF1D_Parameters(self, ao_mesh)
+   SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINES(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_BSPLINES), INTENT(INOUT) :: self
      CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
 
-     self % oi_n_order                = 2 
-     self % oi_n_max_order            = 2
-     ao_mesh % oi_n_vtex_per_elmt     = 2
-     ao_mesh % oi_n_max_vtex_per_elmt = 2
-     ao_mesh % oi_n_order             = self % oi_n_order
 
-   END SUBROUTINE Init_FE_BasisF1D_Parameters
+   END SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINES
    ! ...................................................
 
    ! ...................................................
    SUBROUTINE Init_FE_BasisF1D(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_BSPLINES), INTENT(INOUT) :: self
      CLASS(DEF_MESH_1D), INTENT(INOUT) :: ao_mesh
      ! LOCAL
      INTEGER       :: iv, jv, ig, il
-     REAL(KIND=RK) :: s , t, phi
-     REAL(KIND=RK), DIMENSION(ao_mesh % oi_n_vtex_per_elmt,self % oi_n_order)   :: BT   ,  BT_p , BT_pp
+     REAL(KIND=SPI_RK) :: s , t, phi
+     REAL(KIND=SPI_RK), DIMENSION(ao_mesh % oi_n_vtex_per_elmt,self % oi_n_order)   :: BT   ,  BT_p , BT_pp
     
     
      ALLOCATE(self % TestfT_0 (ao_mesh % ptr_quad % oi_n_points, self % oi_n_order, ao_mesh % oi_n_vtex_per_elmt))
@@ -104,12 +96,12 @@ CONTAINS
   SUBROUTINE basisfunctions1D(s, ai_n_vtex_per_elmt_Tor, ai_n_order_Tor,Bt,Bt_s,Bt_ss)
 
     ! --- Routine parameters
-    REAL(KIND=RK), INTENT(in)  :: s          !< s-coordinate in the element
+    REAL(KIND=SPI_RK), INTENT(in)  :: s          !< s-coordinate in the element
     INTEGER                    :: ai_n_vtex_per_elmt_Tor
     INTEGER                    :: ai_n_order_Tor
-    REAL(KIND=RK), INTENT(out) :: Bt(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)     !< Basis functions
-    REAL(KIND=RK), INTENT(out) :: Bt_s(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)   !< Basis functions derived with respect to s
-    REAL(KIND=RK), INTENT(out) :: Bt_ss(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)  !< Basis functions derived two times with respect to s
+    REAL(KIND=SPI_RK), INTENT(out) :: Bt(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)     !< Basis functions
+    REAL(KIND=SPI_RK), INTENT(out) :: Bt_s(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)   !< Basis functions derived with respect to s
+    REAL(KIND=SPI_RK), INTENT(out) :: Bt_ss(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)  !< Basis functions derived two times with respect to s
 
     !---------------------------------------------------------- vertex (1)
     Bt   (1,1)=  2.0*(s**3) - 3.0*(s**2) + 1
