@@ -10,6 +10,6 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_mesh.mod)
 
 add_library(spi_mesh SHARED ${files})
-target_link_libraries(spi_mesh spi_global)
+target_link_libraries(spi_mesh spi_global spi_quadratures)
 install(TARGETS spi_mesh DESTINATION lib)
 ##########################################################################

@@ -30,7 +30,7 @@ IMPLICIT NONE
     ! ... boundary conditions
     INTEGER, PARAMETER  :: SPI_BC_DIRICHLET_HOMOGEN      = 0 
     INTEGER, PARAMETER  :: SPI_BC_PERIODIC               = 1	
-    INTEGER, PARAMETER  :: SPI_BC_NO                     = 2
+    INTEGER, PARAMETER  :: SPI_BC_NONE                   = 2
 
     ! ... MATRIX FORMAT OUTPUT
     INTEGER, PARAMETER  :: SPI_MATRIX_OUTPUT_FORMAT_MM   = 0

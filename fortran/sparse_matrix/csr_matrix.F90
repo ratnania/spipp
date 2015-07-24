@@ -202,16 +202,10 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   subroutine create_SparseMatrix_with_LM ( self, ai_nR, ai_nC, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+   subroutine initialize_csr_matrix_with_LM ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
    implicit none
       !> param[inout] self : CSR MATRIX STRUCTURE		
       type(DEF_MATRIX_CSR) :: self
-      !> param[in] ai_nC : NUMBER OF COLUMNS, IT IS THE DIMENSION OF THE 1st SPACE		
-      integer :: ai_nC
-      !> param[in] ai_nR : NUMBER OF ROWS, IT IS THE DIMENSION OF THE 2nd SPACE		
-      integer :: ai_nR
-      !> param[in] ai_nel : NUMBER OF ELEMENTS (WITH NON ZERO MEASURE) IN THE PATCH   		
-      integer :: ai_nel		
       !> param[in] api_LM_1 : LM ARRAY FOR ROWS
       integer, dimension(:,:), pointer :: api_LM_1
       !> param[in] api_LM_1 : LM ARRAY FOR COLUMNS
@@ -226,10 +220,10 @@ CONTAINS
       integer, dimension(:,:), pointer :: lpi_columns	
       integer, dimension(:), pointer :: lpi_occ			
       
-      allocate(lpi_columns(ai_nR, 0:8*ai_nen_2),stat=li_err)
+      allocate(lpi_columns(self%oi_nR, 0:8*ai_nen_2),stat=li_err)
       if (li_err.ne.0) li_flag=1	
       
-      allocate(lpi_occ(ai_nR+1),stat=li_err)
+      allocate(lpi_occ(self%oi_nR+1),stat=li_err)
       if (li_err.ne.0) li_flag=2	
                               
       lpi_columns ( :, : ) = 0
@@ -237,30 +231,15 @@ CONTAINS
       
      ! COUNTING NON ZERO ELEMENTS
          
-      li_nnz = count_non_zero_elts ( ai_nR, ai_nC, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )
+      li_nnz = count_non_zero_elts ( self%oi_nR, self%oi_nC, self%oi_nel, &
+              & api_LM_1, ai_nen_1, &
+              & api_LM_2, ai_nen_2, &
+              & lpi_columns, lpi_occ )
       
-      self%ol_use_mm_format = .FALSE.
-      
-      self%oi_nR   = ai_nR
-      self%oi_nC   = ai_nC		
-      self%oi_nel  = li_nnz
-      
-      allocate(self%opi_ia(self%oi_nR+1),stat=li_err)
-      if (li_err.ne.0) li_flag=10	
-      
-      allocate(self%opi_ja(self%oi_nel),stat=li_err)
-      if (li_err.ne.0) li_flag=20	
-      
-      allocate(self%opr_a(self%oi_nel),stat=li_err)
-      if (li_err.ne.0) li_flag=30		
-      
-      call init_SparseMatrix ( self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )					
-      
-      self%opr_a ( : ) = 0.0
-      
+      call init_SparseMatrix ( self, self%oi_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )					
       deallocate(lpi_columns)		
       deallocate(lpi_occ)		
-   end subroutine create_SparseMatrix_with_LM	
+   end subroutine initialize_csr_matrix_with_LM
    ! ...................................................
      
    ! ...................................................

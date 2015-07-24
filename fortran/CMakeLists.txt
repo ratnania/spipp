@@ -35,9 +35,9 @@ add_subdirectory(quadratures)
 
 ##########################################################################
 add_subdirectory(mesh)
-#IF(BUILD_TESTS)
-#   add_subdirectory(mesh/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(mesh/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
@@ -52,6 +52,13 @@ add_subdirectory(blackbox)
 #IF(BUILD_TESTS)
 #   add_subdirectory(blackbox/tests)
 #ENDIF(BUILD_TESTS)
+##########################################################################
+
+##########################################################################
+add_subdirectory(numbering)
+IF(BUILD_TESTS)
+   add_subdirectory(numbering/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################

@@ -87,6 +87,7 @@ SET(SPIPP_MESH_DIR          ${PROJECT_SOURCE_DIR}/fortran/mesh)
 SET(SPIPP_SPARSE_MATRIX_DIR ${PROJECT_SOURCE_DIR}/fortran/sparse_matrix)
 SET(SPIPP_MATRIX_DIR        ${PROJECT_SOURCE_DIR}/fortran/matrix)
 SET(SPIPP_UTILITIES_DIR     ${PROJECT_SOURCE_DIR}/fortran/utilities)
+SET(SPIPP_NUMBERING_DIR     ${PROJECT_SOURCE_DIR}/fortran/numbering)
 
 enable_language (Fortran)
 
