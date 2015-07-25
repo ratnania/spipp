@@ -43,6 +43,15 @@ implicit none
    CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
 
    call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n, ai_nel=li_nel )
+
+   PRINT *, ">>> LM"
+   PRINT *, lo_numbering % opi_LM
+
+   print *, "%%%%%"
+   CALL initialize_sparse_matrix_with_LM(lo_A, lo_mesh % oi_n_elmts, &
+           & lo_numbering % opi_LM, lo_mesh % oi_nen, &
+           & lo_numbering % opi_LM, lo_mesh % oi_nen)
+   print *, "%%%%%"
    
    ! ... save the matrix in the MM format
    CALL save_sparse_matrix(lo_A, ls_file, SPI_MATRIX_OUTPUT_FORMAT_MM)  

@@ -177,13 +177,14 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE initialize_sparse_matrix_with_LM( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+   SUBROUTINE initialize_sparse_matrix_with_LM(self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
    IMPLICIT NONE
       CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      INTEGER :: ai_nel
       !> param[in] api_LM_1 : LM ARRAY FOR ROWS
-      integer, dimension(:,:), pointer :: api_LM_1
+      integer, dimension(:,:) :: api_LM_1
       !> param[in] api_LM_1 : LM ARRAY FOR COLUMNS
-      integer, dimension(:,:), pointer :: api_LM_2					
+      integer, dimension(:,:) :: api_LM_2					
       !> param[in] ai_nen_1 : NUMBER OF NON VANISHING FUNCTIONS PER ELEMENT, IN THE 1st SPACE 
       integer :: ai_nen_1
       !> param[in] ai_nen_2 : NUMBER OF NON VANISHING FUNCTIONS PER ELEMENT, IN THE 2nd SPACE
@@ -195,7 +196,7 @@ CONTAINS
       ! ...
       SELECT TYPE (self)
       CLASS IS (DEF_MATRIX_CSR)
-         CALL initialize_csr_matrix_with_LM ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+         CALL initialize_csr_matrix_with_LM (self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
      
       CLASS IS (DEF_MATRIX_BND)
          STOP "initialize_sparse_matrix_with_LM: not yet implemented"

@@ -138,15 +138,15 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   integer function count_non_zero_elts ( ai_nR, ai_nC, ai_nel, &
+   integer function count_non_zero_elts ( ai_nR, ai_nel, &
                                         & api_LM_1, ai_nen_1, &
                                         & api_LM_2, ai_nen_2, &
                                         & api_columns, api_occ )
    ! _1 FOR ROWS
    ! _2 FOR COLUMNS	
    implicit none
-      integer :: ai_nR, ai_nC
-      integer, dimension(:,:), pointer :: api_LM_1, api_LM_2			
+      integer :: ai_nR
+      integer, dimension(:,:) :: api_LM_1, api_LM_2			
       integer :: ai_nel, ai_nen_1, ai_nen_2
       integer, dimension(:,:), pointer :: api_columns	
       integer, dimension(:), pointer :: api_occ	
@@ -193,23 +193,26 @@ CONTAINS
             end do					
          end do
       end do
+      print *, ">>>>>>>>>"
       
       ! COUNT NON ZERO ELEMENTS		
       li_result = SUM ( api_occ ( 1 : ai_nR ) )
+               print *, "pass"
       
       count_non_zero_elts = li_result
    end function count_non_zero_elts	   
    ! ...................................................
 
    ! ...................................................
-   subroutine initialize_csr_matrix_with_LM ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+   subroutine initialize_csr_matrix_with_LM ( self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
    implicit none
       !> param[inout] self : CSR MATRIX STRUCTURE		
       type(DEF_MATRIX_CSR) :: self
+      INTEGER :: ai_nel
       !> param[in] api_LM_1 : LM ARRAY FOR ROWS
-      integer, dimension(:,:), pointer :: api_LM_1
+      integer, dimension(:,:) :: api_LM_1
       !> param[in] api_LM_1 : LM ARRAY FOR COLUMNS
-      integer, dimension(:,:), pointer :: api_LM_2					
+      integer, dimension(:,:) :: api_LM_2					
       !> param[in] ai_nen_1 : NUMBER OF NON VANISHING FUNCTIONS PER ELEMENT, IN THE 1st SPACE 
       integer :: ai_nen_1
       !> param[in] ai_nen_2 : NUMBER OF NON VANISHING FUNCTIONS PER ELEMENT, IN THE 2nd SPACE
@@ -220,6 +223,10 @@ CONTAINS
       integer, dimension(:,:), pointer :: lpi_columns	
       integer, dimension(:), pointer :: lpi_occ			
       
+      self % oi_nR =  MAXVAL(api_LM_1)
+      self % oi_nC =  MAXVAL(api_LM_2)
+      self % oi_nel = ai_nel
+
       allocate(lpi_columns(self%oi_nR, 0:8*ai_nen_2),stat=li_err)
       if (li_err.ne.0) li_flag=1	
       
@@ -229,12 +236,12 @@ CONTAINS
       lpi_columns ( :, : ) = 0
       lpi_occ ( : ) = 0
       
-     ! COUNTING NON ZERO ELEMENTS
-         
-      li_nnz = count_non_zero_elts ( self%oi_nR, self%oi_nC, self%oi_nel, &
+      ! COUNTING NON ZERO ELEMENTS
+      li_nnz = count_non_zero_elts ( self % oi_nR, ai_nel, &
               & api_LM_1, ai_nen_1, &
               & api_LM_2, ai_nen_2, &
               & lpi_columns, lpi_occ )
+      print *, "nnz ", li_nnz
       
       call init_SparseMatrix ( self, self%oi_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )					
       deallocate(lpi_columns)		
@@ -248,7 +255,7 @@ CONTAINS
    ! _2 FOR COLUMNS	
    implicit none
       type(DEF_MATRIX_CSR) :: self
-      integer, dimension(:,:), pointer :: api_LM_1, api_LM_2			
+      integer, dimension(:,:) :: api_LM_1, api_LM_2			
       integer :: ai_nel, ai_nen_1, ai_nen_2
       integer, dimension(:,:), pointer :: api_columns	
       integer, dimension(:), pointer :: api_occ	
