@@ -46,9 +46,9 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(blackbox)
-#IF(BUILD_TESTS)
-#   add_subdirectory(blackbox/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(blackbox/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################

@@ -10,12 +10,14 @@ MODULE SPI_BLACKBOX
   ! .........................................................
   SUBROUTINE CREATE_BLACKBOX(self, ao_basis, ao_quad)
   IMPLICIT NONE
-    CLASS(DEF_BLACKBOX_ABSTRACT) :: self
-    CLASS(DEF_BASIS_ABSTRACT)    :: ao_basis
-    CLASS(DEF_QUADRATURE_1D)     :: ao_quad
+    CLASS(DEF_BLACKBOX_ABSTRACT), INTENT(INOUT) :: self
+    CLASS(DEF_BASIS_ABSTRACT)   , TARGET        :: ao_basis
+    CLASS(DEF_QUADRATURE_1D)    , TARGET        :: ao_quad
     ! LOCAL
     INTEGER, PARAMETER :: N_DIM=1
     INTEGER :: li_err
+
+    self % ptr_quad => ao_quad
 
     CALL CREATE_BLACKBOX_ABSTRACT(self, ao_quad % oi_n_points)
     
@@ -24,7 +26,7 @@ MODULE SPI_BLACKBOX
     CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
        SELECT TYPE (ao_basis)
        CLASS IS (DEF_BASIS_1D_BSPLINE)
-          CALL CREATE_BLACKBOX_1D_BSPLINE(self, ao_basis, ao_quad)
+          CALL CREATE_BLACKBOX_1D_BSPLINE(self, ao_basis)
        CLASS DEFAULT
           STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
        END SELECT
@@ -32,7 +34,7 @@ MODULE SPI_BLACKBOX
     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
        SELECT TYPE (ao_basis)
        CLASS IS (DEF_BASIS_1D_HBEZIER)
-          CALL CREATE_BLACKBOX_1D_HBEZIER(self, ao_basis, ao_quad)
+          CALL CREATE_BLACKBOX_1D_HBEZIER(self, ao_basis)
        CLASS DEFAULT
           STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
        END SELECT
@@ -40,7 +42,7 @@ MODULE SPI_BLACKBOX
     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
        SELECT TYPE (ao_basis)
        CLASS IS (DEF_BASIS_1D_FOURIER)
-          CALL CREATE_BLACKBOX_1D_FOURIER(self, ao_basis, ao_quad)
+          CALL CREATE_BLACKBOX_1D_FOURIER(self, ao_basis)
        CLASS DEFAULT
           STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
        END SELECT
@@ -86,37 +88,40 @@ MODULE SPI_BLACKBOX
   ! .........................................................
 
   ! ........................................................
-  SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE(self, ao_basis, ao_quad)
+  SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE(self, ao_basis)
   implicit none
      type(DEF_BLACKBOX_1D_BSPLINE)        , INTENT(INOUT) :: self
      TYPE(DEF_BASIS_1D_BSPLINE)   , TARGET, INTENT(IN)    :: ao_basis
-     TYPE(DEF_QUADRATURE_1D)      , TARGET, INTENT(IN)    :: ao_quad
      ! LOCAL VARIABLES
      integer  :: li_ref
+
+     self % ptr_basis => ao_basis
 
   END SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE
   ! ........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_BLACKBOX_1D_FOURIER(self, ao_basis, ao_quad)
+  SUBROUTINE CREATE_BLACKBOX_1D_FOURIER(self, ao_basis)
   IMPLICIT NONE
      TYPE(DEF_BLACKBOX_1D_FOURIER)        , INTENT(INOUT)  :: self
      TYPE(DEF_BASIS_1D_FOURIER)   , TARGET, INTENT(IN)     :: ao_basis
-     TYPE(DEF_QUADRATURE_1D)      , TARGET, INTENT(IN)     :: ao_quad
      ! LOCAL
      INTEGER :: li_err 
+
+     self % ptr_basis => ao_basis
 
   END SUBROUTINE CREATE_BLACKBOX_1D_FOURIER
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_BLACKBOX_1D_HBEZIER(self, ao_basis, ao_quad)
+  SUBROUTINE CREATE_BLACKBOX_1D_HBEZIER(self, ao_basis)
   IMPLICIT NONE
      TYPE(DEF_BLACKBOX_1D_HBEZIER)        , INTENT(INOUT)  :: self
      TYPE(DEF_BASIS_1D_HBEZIER)   , TARGET, INTENT(IN)     :: ao_basis
-     TYPE(DEF_QUADRATURE_1D)      , TARGET, INTENT(IN)     :: ao_quad
      ! LOCAL
      INTEGER :: li_err 
+
+     self % ptr_basis => ao_basis
 
   END SUBROUTINE CREATE_BLACKBOX_1D_HBEZIER
   ! .........................................................
@@ -164,7 +169,7 @@ MODULE SPI_BLACKBOX
   ! .........................................................
   SUBROUTINE BLACKBOX_RESET_POSITION(self)
   IMPLICIT NONE
-    TYPE(DEF_BLACKBOX_1D)  :: self
+    CLASS(DEF_BLACKBOX_ABSTRACT)  :: self
     ! LOCAL
 
     self%Xp_0  = 0.0 
@@ -224,7 +229,7 @@ MODULE SPI_BLACKBOX
      DO kg = 1, self % oi_n_points
         self % Vol(kg) = ABS( ar_b - ar_a )
        
-        self % wVol(kg) = self % Vol(kg) * self % ptr_quad % opr_weights(kg)
+        self % wVol(kg) = self % Vol(kg) !* self % ptr_quad % opr_weights(kg)
      END DO
 
   END SUBROUTINE COMPUTE_METRIC_BLACKBOX_1D_BSPLINE
