@@ -20,16 +20,20 @@ USE SPI_MESH
 implicit none
    ! LOCAL
    TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
+   TYPE(DEF_QUADRATURE_1D), TARGET :: lo_quad
    ! ... number of internal knots is = N - P - 1
    INTEGER, PARAMETER :: N = 5 
    INTEGER, PARAMETER :: P = 3
+   INTEGER, PARAMETER :: K = 3 
 
-   CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
+   CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
+   CALL CREATE_MESH(lo_mesh, lo_quad, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
 !   CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_DIRICHLET_HOMOGEN) 
 
    PRINT *, ">>> knots"
    PRINT *, lo_mesh % opr_knot
 
+   CALL FREE_QUADRATURE(lo_quad) 
    CALL FREE_MESH(lo_mesh) 
 end subroutine test1
 ! ............................................

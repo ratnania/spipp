@@ -3,17 +3,17 @@ MODULE SPI_BASIS
   USE SPI_BASIS_DEF
   USE SPI_BASIS_BSPLINE
   USE SPI_BASIS_FOURIER 
+  USE SPI_BASIS_HBEZIER
   USE SPI_MESH_DEF
   USE SPI_GLOBAL_DEF
   IMPLICIT NONE
 
 CONTAINS
    ! ...................................................
-   SUBROUTINE CREATE_BASIS(self, ao_mesh, ai_type, dirname)
+   SUBROUTINE CREATE_BASIS(self, ao_mesh, dirname)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT)      , INTENT(INOUT) :: self
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: ao_mesh
-     INTEGER                        , INTENT(IN)    :: ai_type
      CHARACTER(LEN = 1024), OPTIONAL, INTENT(IN)    :: dirname
      ! LOCAL
 
@@ -63,21 +63,19 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE FREE_BASIS(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE FREE_BASIS(self)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_ABSTRACT), INTENT(INOUT) :: ao_mesh
-     INTEGER, INTENT(IN)       :: ai_elmt_id
      ! LOCAL
 
      ! ...
      SELECT TYPE (self)
      CLASS IS (DEF_BASIS_1D_BSPLINE)
-        CALL FREE_BASIS_1D_BSPLINES(self)
+        CALL FREE_BASIS_1D_BSPLINE(self)
      CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL FREE_BASIS_1D_FOURIER(self)
-     CLASS IS (DEF_BASIS_1D_FOURIER)
         CALL FREE_BASIS_1D_HBEZIER(self)
+     CLASS IS (DEF_BASIS_1D_FOURIER)
+        CALL FREE_BASIS_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'FREE_BASIS: unexpected type for self object!'
      END SELECT
@@ -87,11 +85,9 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE RESET_BASIS(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE RESET_BASIS(self)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_ABSTRACT), INTENT(INOUT) :: ao_mesh
-     INTEGER, INTENT(IN)       :: ai_elmt_id
      ! LOCAL
 
      ! ...
@@ -99,9 +95,9 @@ CONTAINS
      CLASS IS (DEF_BASIS_1D_BSPLINE)
         CALL RESET_BASIS_1D_BSPLINE(self)
      CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL RESET_BASIS_1D_FOURIER(self)
-     CLASS IS (DEF_BASIS_1D_FOURIER)
         CALL RESET_BASIS_1D_HBEZIER(self)
+     CLASS IS (DEF_BASIS_1D_FOURIER)
+        CALL RESET_BASIS_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'RESET_BASIS: unexpected type for self object!'
      END SELECT
@@ -111,10 +107,9 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE UPDATE_BASIS(self, ai_elmt_id)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_ABSTRACT), INTENT(INOUT) :: ao_mesh
      INTEGER, INTENT(IN)       :: ai_elmt_id
      ! LOCAL
 
@@ -123,32 +118,17 @@ CONTAINS
 
      ! ...
      CLASS IS (DEF_BASIS_1D_BSPLINE)
-        SELECT TYPE (ao_mesh)
-        CLASS IS (DEF_MESH_1D_BSPLINE)
-           CALL UPDATE_BASIS_1D_BSPLINE(self, ao_mesh, ai_elmt_id)
-        CLASS DEFAULT
-           STOP 'UPDATE_BASIS: unexpected type for ao_mesh object!'
-        END SELECT
+        CALL UPDATE_BASIS_1D_BSPLINE(self, ai_elmt_id)
      ! ...
 
      ! ...
      CLASS IS (DEF_BASIS_1D_FOURIER)
-        SELECT TYPE (ao_mesh)
-        CLASS IS (DEF_MESH_1D_FOURIER)
-           CALL UPDATE_BASIS_1D_FOURIER(self, ao_mesh, ai_elmt_id)
-        CLASS DEFAULT
-           STOP 'UPDATE_BASIS: unexpected type for ao_mesh object!'
-        END SELECT
+        CALL UPDATE_BASIS_1D_FOURIER(self, ai_elmt_id)
      ! ...
 
      ! ...
      CLASS IS (DEF_BASIS_1D_HBEZIER)
-        SELECT TYPE (ao_mesh)
-        CLASS IS (DEF_MESH_1D_FOURIER)
-           CALL UPDATE_BASIS_1D_HBEZIER(self, ao_mesh, ai_elmt_id)
-        CLASS DEFAULT
-           STOP 'UPDATE_BASIS: unexpected type for ao_mesh object!'
-        END SELECT
+        CALL UPDATE_BASIS_1D_HBEZIER(self, ai_elmt_id)
      ! ...
 
      CLASS DEFAULT
@@ -158,4 +138,5 @@ CONTAINS
 
    END SUBROUTINE UPDATE_BASIS
    ! ...................................................
+
 END MODULE SPI_BASIS

@@ -39,9 +39,9 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(basis)
-#IF(BUILD_TESTS)
-#   add_subdirectory(basis/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(basis/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################

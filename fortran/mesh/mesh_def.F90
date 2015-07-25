@@ -30,12 +30,13 @@ MODULE SPI_MESH_DEF
      INTEGER :: oi_nnp
      !> TYPE BOUNDARY CONDITION
      INTEGER :: oi_type_bc
+
+     CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
   END TYPE DEF_MESH_ABSTRACT
   ! .........................................................
 
   ! .........................................................
   TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D
-     CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
   END TYPE DEF_MESH_1D
   ! .........................................................
 
