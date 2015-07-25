@@ -74,9 +74,9 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(matrix)
-#IF(BUILD_TESTS)
-#   add_subdirectory(matrix/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(matrix/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
