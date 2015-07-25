@@ -53,9 +53,9 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(greenbox)
-#IF(BUILD_TESTS)
-#   add_subdirectory(greenbox/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(greenbox/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
