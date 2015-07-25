@@ -19,8 +19,8 @@ USE SPI_MESH_DEF
 USE SPI_MESH
 implicit none
    ! LOCAL
-   TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
    TYPE(DEF_QUADRATURE_1D), TARGET :: lo_quad
+   TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
    ! ... number of internal knots is = N - P - 1
    INTEGER, PARAMETER :: N = 5 
    INTEGER, PARAMETER :: P = 3
