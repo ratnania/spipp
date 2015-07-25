@@ -14,9 +14,6 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(global)
-#IF(BUILD_TESTS)
-#   add_subdirectory(global/tests)
-#ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
@@ -28,9 +25,9 @@ add_subdirectory(utilities)
 
 ##########################################################################
 add_subdirectory(quadratures)
-#IF(BUILD_TESTS)
-#   add_subdirectory(quadratures/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(quadratures/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
@@ -55,6 +52,13 @@ add_subdirectory(blackbox)
 ##########################################################################
 
 ##########################################################################
+add_subdirectory(greenbox)
+#IF(BUILD_TESTS)
+#   add_subdirectory(greenbox/tests)
+#ENDIF(BUILD_TESTS)
+##########################################################################
+
+##########################################################################
 add_subdirectory(numbering)
 IF(BUILD_TESTS)
    add_subdirectory(numbering/tests)
@@ -69,14 +73,14 @@ ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
-#add_subdirectory(matrix)
+add_subdirectory(matrix)
 #IF(BUILD_TESTS)
 #   add_subdirectory(matrix/tests)
 #ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
-#add_subdirectory(space)
+add_subdirectory(space)
 #IF(BUILD_TESTS)
 #   add_subdirectory(space/tests)
 #ENDIF(BUILD_TESTS)

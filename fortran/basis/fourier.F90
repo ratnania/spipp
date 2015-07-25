@@ -40,6 +40,14 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
+   SUBROUTINE FREE_BASIS_1D_FOURIER(self)
+    IMPLICIT NONE
+     CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self
+
+   END SUBROUTINE FREE_BASIS_1D_FOURIER
+   ! ...................................................
+
+   ! ...................................................
    SUBROUTINE RESET_BASIS_1D_FOURIER(self)
     IMPLICIT NONE
      CLASS(DEF_BASIS_1D), INTENT(INOUT) :: self

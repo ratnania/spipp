@@ -4,6 +4,7 @@ set(files
         ${SPIPP_BASIS_DIR}/bsplines.F90
         ${SPIPP_BASIS_DIR}/fourier_mods.F90
         ${SPIPP_BASIS_DIR}/fourier.F90
+        ${SPIPP_BASIS_DIR}/hbezier.F90
 	${SPIPP_BASIS_DIR}/basis.F90 )
 
 set(mods 
@@ -11,9 +12,10 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_basis_bsplines.mod
           ${CMAKE_BINARY_DIR}/modules/spi_fourier_mods.mod
           ${CMAKE_BINARY_DIR}/modules/spi_basis_fourier.mod
+          ${CMAKE_BINARY_DIR}/modules/spi_basis_hbezier.mod
           ${CMAKE_BINARY_DIR}/modules/basis.mod)
 
 add_library(spi_basis SHARED ${files})
-target_link_libraries(spi_basis spi_global spi_mesh)
+target_link_libraries(spi_basis spi_global spi_quadratures spi_mesh)
 install(TARGETS spi_basis DESTINATION lib)
 ##########################################################################

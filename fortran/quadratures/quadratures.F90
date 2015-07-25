@@ -5,14 +5,14 @@ MODULE SPI_QUADRATURES
 
     CONTAINS
   ! .............................................
-  SUBROUTINE CREATE_QUADRATURE(self, ai_dim, ai_type, ai_n, ai_n_period, dirname)
+  SUBROUTINE CREATE_QUADRATURE(self, ai_type, ai_n, ai_n_period, dirname, ai_dim)
   IMPLICIT NONE
      CLASS(DEF_QUADRATURE_ABSTRACT) , INTENT(INOUT) :: self
-     INTEGER                        , INTENT(IN)    :: ai_dim
      INTEGER                        , INTENT(IN)    :: ai_type
      INTEGER                        , INTENT(IN)    :: ai_n 
      INTEGER              , OPTIONAL, INTENT(IN)    :: ai_n_period
      CHARACTER(LEN = 1024), OPTIONAL, INTENT(IN)    :: dirname
+     INTEGER              , OPTIONAL, INTENT(IN)    :: ai_dim
      ! LOCAL
      INTEGER :: li_n
 
@@ -23,7 +23,12 @@ MODULE SPI_QUADRATURES
      END IF
 
      self % oi_type     = ai_type 
-     self % oi_dim      = ai_dim 
+
+     IF (PRESENT(ai_dim)) THEN
+        self % oi_dim      = ai_dim 
+     ELSE
+        self % oi_dim      = 1 
+     END IF
 
      SELECT TYPE (self)
      CLASS IS (DEF_QUADRATURE_1D)

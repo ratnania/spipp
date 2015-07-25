@@ -1,80 +1,68 @@
 !# -*- coding: utf8 -*-
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-!*                                                                           */
-!*                  This file is part of the PlaTo program                   */
-!*                                                                           */
-!* Copyright (C) 2011-2012 B. Nkonga                                         */
-!*                                                                           */
-!*  PlaTo  is distributed under the terms of the Cecill-B License.           */
-!*                                                                           */
-!*  You can find a copy of the Cecill-B License at :                         */
-!*  http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt                 */
-!*                                                                           */
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-MODULE SPI_BASIS_BSPLINE 
+MODULE SPI_BASIS_HBEZIER 
   USE SPI_BASIS_DEF
   USE SPI_MESH_DEF
 
   IMPLICIT NONE
 
   PRIVATE
-  PUBLIC :: CREATE_BASIS_1D_BSPLINE, RESET_BASIS_1D_BSPLINE, UPDATE_BASIS_1D_BSPLINE
+  PUBLIC :: CREATE_BASIS_1D_HBEZIER, RESET_BASIS_1D_HBEZIER, UPDATE_BASIS_1D_HBEZIER
 
 CONTAINS
 
    ! ...................................................
-   SUBROUTINE CREATE_BASIS_1D_BSPLINE(self, ao_mesh)
+   SUBROUTINE CREATE_BASIS_1D_HBEZIER(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: ao_mesh
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
+     CLASS(DEF_MESH_1D_HBEZIER), INTENT(INOUT) :: ao_mesh
 
      CALL Init_FE_BasisF1D_Parameters(self, ao_mesh)
      CALL Init_FE_BasisF1D(self, ao_mesh)
 
-   END SUBROUTINE CREATE_BASIS_1D_BSPLINE
+   END SUBROUTINE CREATE_BASIS_1D_HBEZIER
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE FREE_BASIS_1D_BSPLINE(self)
+   SUBROUTINE FREE_BASIS_1D_HBEZIER(self)
     IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
 
-   END SUBROUTINE FREE_BASIS_1D_BSPLINE
+   END SUBROUTINE FREE_BASIS_1D_HBEZIER
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE RESET_BASIS_1D_BSPLINE(self)
+   SUBROUTINE RESET_BASIS_1D_HBEZIER(self)
     IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
 
-   END SUBROUTINE RESET_BASIS_1D_BSPLINE
+   END SUBROUTINE RESET_BASIS_1D_HBEZIER
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS_1D_BSPLINE(self, ao_mesh, ai_elmt_id)
+   SUBROUTINE UPDATE_BASIS_1D_HBEZIER(self, ao_mesh, ai_elmt_id)
     IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: ao_mesh
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
+     CLASS(DEF_MESH_1D_HBEZIER), INTENT(INOUT) :: ao_mesh
      INTEGER, INTENT(IN)       :: ai_elmt_id
 
-   END SUBROUTINE UPDATE_BASIS_1D_BSPLINE
+   END SUBROUTINE UPDATE_BASIS_1D_HBEZIER
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINE(self, ao_mesh)
+   SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_HBEZIER(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: ao_mesh
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
+     CLASS(DEF_MESH_1D_HBEZIER), INTENT(INOUT) :: ao_mesh
 
 
-   END SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINE
+   END SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_HBEZIER
    ! ...................................................
 
    ! ...................................................
    SUBROUTINE Init_FE_BasisF1D(self, ao_mesh)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     CLASS(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: ao_mesh
+     CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
+     CLASS(DEF_MESH_1D_HBEZIER), INTENT(INOUT) :: ao_mesh
      ! LOCAL
      INTEGER       :: iv, jv, ig, il
      REAL(KIND=SPI_RK) :: s , t, phi
@@ -134,4 +122,4 @@ CONTAINS
   END SUBROUTINE basisfunctions1D
    ! ...................................................
 
-END MODULE SPI_BASIS_BSPLINE
+END MODULE SPI_BASIS_HBEZIER

@@ -22,11 +22,6 @@ IMPLICIT NONE
 
     !!!!!!!!!!!!!!!!! VALUES !!!!!!!!!!!!!!!
 
-    ! ... basis type 
-    INTEGER, PARAMETER  :: SPI_INT_BASIS_BSPLINES        = 1 ! B-Splines 
-    INTEGER, PARAMETER  :: SPI_INT_BASIS_HBEZIER         = 2 ! Hermite-Bezier 
-    INTEGER, PARAMETER  :: SPI_INT_BASIS_FOURIER         = 3 ! fourier
-
     ! ... boundary conditions
     INTEGER, PARAMETER  :: SPI_BC_DIRICHLET_HOMOGEN      = 0 
     INTEGER, PARAMETER  :: SPI_BC_PERIODIC               = 1	
