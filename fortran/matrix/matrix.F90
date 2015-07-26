@@ -12,9 +12,13 @@ MODULE SPI_MATRIX
   PUBLIC :: CREATE_MATRIX               &
        ,    GET_NR_MATRIX               &
        ,    GET_NC_MATRIX               &
-       ,    RESET_ELEMENT_MATRIX &
+       ,    RESET_MATRIX_MATRIX         &
+       ,    RESET_MATRIX_RHS            &
+       ,    RESET_ELEMENT_MATRIX        &
        ,    RESET_ELEMENT_RHS_MATRIX    &
-       ,    GLOBAL_TO_INDEX_MATRIX &
+       ,    ASSEMBLYBEGIN_MATRIX        &
+       ,    ASSEMBLYEND_MATRIX          &
+       ,    GLOBAL_TO_INDEX_MATRIX      &
        ,    FREE_MATRIX
   
 CONTAINS
@@ -67,6 +71,24 @@ CONTAINS
 
   END SUBROUTINE GLOBAL_TO_INDEX_MATRIX
   ! ..................................................
+
+  ! ..........................................................        
+  SUBROUTINE RESET_MATRIX_MATRIX(self)
+  IMPLICIT NONE
+     CLASS(DEF_MATRIX_ABSTRACT) :: self
+     ! LOCAL
+     
+  END SUBROUTINE RESET_MATRIX_MATRIX
+  ! ..........................................................  
+
+  ! ..........................................................        
+  SUBROUTINE RESET_MATRIX_RHS(self)
+  IMPLICIT NONE
+     CLASS(DEF_MATRIX_ABSTRACT) :: self
+     ! LOCAL
+
+  END SUBROUTINE RESET_MATRIX_RHS
+  ! ..........................................................  
     
   ! ..........................................................        
   SUBROUTINE RESET_ELEMENT_MATRIX(self)
@@ -74,16 +96,8 @@ CONTAINS
      CLASS(DEF_MATRIX_ABSTRACT) :: self
      ! LOCAL
 
-#ifdef DEBUG_TRACE 
-    CALL printlog("RESET_ELEMENT_MATRIX: Begin", ai_dtllevel = 2)
-#endif     
-
      self % Matrix_Contribution = 0.0
      
-#ifdef DEBUG_TRACE 
-CALL printlog("RESET_ELEMENT_MATRIX: End", ai_dtllevel = 2)
-#endif
-
   END SUBROUTINE RESET_ELEMENT_MATRIX
   ! ..........................................................  
 
@@ -93,18 +107,38 @@ CALL printlog("RESET_ELEMENT_MATRIX: End", ai_dtllevel = 2)
      CLASS(DEF_MATRIX_ABSTRACT) :: self
      ! LOCAL
 
-#ifdef DEBUG_TRACE 
-    CALL printlog("RESET_ELEMENT_RHS_MATRIX: Begin", ai_dtllevel = 2)
-#endif     
-
      self % Rhs_Contribution    = 0.0
      
-#ifdef DEBUG_TRACE 
-CALL printlog("RESET_ELEMENT_RHS_MATRIX: End", ai_dtllevel = 2)
-#endif
-
   END SUBROUTINE RESET_ELEMENT_RHS_MATRIX
   ! ..........................................................  
+
+  ! ..........................................................        
+  SUBROUTINE ASSEMBLYBEGIN_MATRIX(self)
+  IMPLICIT NONE
+     CLASS(DEF_MATRIX_ABSTRACT) :: self
+     ! LOCAL
+
+  END SUBROUTINE ASSEMBLYBEGIN_MATRIX
+  ! ..........................................................  
+
+  ! ..........................................................        
+  SUBROUTINE ASSEMBLYEND_MATRIX(self)
+  IMPLICIT NONE
+     CLASS(DEF_MATRIX_ABSTRACT) :: self
+     ! LOCAL
+
+  END SUBROUTINE ASSEMBLYEND_MATRIX
+  ! ..........................................................  
+
+  ! ..........................................................        
+!  SUBROUTINE _MATRIX(self)
+!  IMPLICIT NONE
+!     CLASS(DEF_MATRIX_ABSTRACT) :: self
+!     ! LOCAL
+!
+!  END SUBROUTINE _MATRIX
+  ! ..........................................................  
+
 
   ! ..........................................................        
   SUBROUTINE FREE_MATRIX(self)
@@ -112,16 +146,8 @@ CALL printlog("RESET_ELEMENT_RHS_MATRIX: End", ai_dtllevel = 2)
      CLASS(DEF_MATRIX_ABSTRACT) :: self
      ! LOCAL
 
-#ifdef DEBUG_TRACE 
-    CALL printlog("FREE_MATRIX: Begin", ai_dtllevel = 0)
-#endif     
-
      DEALLOCATE(self % Matrix_Contribution)
      DEALLOCATE(self % Rhs_Contribution   )
-     
-#ifdef DEBUG_TRACE 
-CALL printlog("FREE_MATRIX: End", ai_dtllevel = 0)
-#endif
 
   END SUBROUTINE FREE_MATRIX
   ! ..........................................................  

@@ -51,6 +51,17 @@ CONTAINS
    
    end subroutine free_bnd_matrix		
    ! ...................................................
+
+   ! ...................................................
+   subroutine reset_bnd_matrix(self)
+   implicit none
+      type(DEF_MATRIX_BND) :: self
+      
+      self%opr_abd = 0.0
+      
+   end subroutine reset_bnd_matrix
+   ! ...................................................
+
    
    ! ...................................................
    subroutine BND_solve_v ( self, apr_B, apr_U )

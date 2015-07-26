@@ -138,6 +138,16 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
+   subroutine reset_csr_matrix(self)
+   implicit none
+      type(DEF_MATRIX_CSR) :: self
+      
+      self%opr_a = 0.0
+      
+   end subroutine reset_csr_matrix
+   ! ...................................................
+
+   ! ...................................................
    integer function count_non_zero_elts ( ai_nR, ai_nel, &
                                         & api_LM_1, ai_nen_1, &
                                         & api_LM_2, ai_nen_2, &

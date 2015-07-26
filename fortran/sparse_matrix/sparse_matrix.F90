@@ -70,6 +70,30 @@ CONTAINS
    ! ...................................................   
 
    ! ...................................................
+   SUBROUTINE reset_sparse_matrix ( self )
+   IMPLICIT NONE
+      CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
+      ! LOCAL
+      INTEGER :: li_err
+      INTEGER :: li_flag
+      
+      ! ...
+      SELECT TYPE (self)
+      CLASS IS (DEF_MATRIX_CSR)
+         CALL reset_csr_matrix(self) 
+     
+      CLASS IS (DEF_MATRIX_BND)
+         CALL reset_bnd_matrix(self)
+     
+      CLASS DEFAULT
+         STOP 'RESET_SPARSE_MATRIX: unexpected type for self object!'
+      END SELECT
+      ! ...
+
+   END SUBROUTINE reset_sparse_matrix
+   ! ...................................................   
+
+   ! ...................................................
    subroutine mult_sparse_matrix_vector(self, apr_x, apr_y)
    implicit none
       CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
