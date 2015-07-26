@@ -9,6 +9,10 @@ MODULE SPI_SPACE
   USE SPI_NUMBERING_DEF
   USE SPI_NUMBERING
   USE SPI_SPACE_DEF
+  USE SPI_BASIS_DEF
+  USE SPI_BASIS
+  USE SPI_BLACKBOX_DEF
+  USE SPI_BLACKBOX
   IMPLICIT NONE
 
 !  PRIVATE
@@ -77,9 +81,10 @@ CONTAINS
      self % ptr_mesh => ao_mesh
 
      CALL CREATE_NUMBERING(self % oo_numbering, ao_mesh)
-
      CALL CREATE_QUADRATURE(self % oo_quad, ai_type, ai_k)
-  
+     CALL CREATE_BASIS(self % oo_basis, self % ptr_mesh, self % oo_quad) 
+     CALL CREATE_BLACKBOX(self % oo_bbox, self % oo_basis, self % oo_quad)
+
   END SUBROUTINE CREATE_SPACE_1D_BSPLINE
   ! ........................................................
 
@@ -142,6 +147,8 @@ CONTAINS
 
       CALL FREE_NUMBERING(self % oo_numbering)
       CALL FREE_QUADRATURE(self % oo_quad)
+      CALL FREE_BASIS(self % oo_basis)
+      CALL FREE_BLACKBOX(self % oo_bbox)
       
    END SUBROUTINE FREE_SPACE_1D_BSPLINE
    ! ........................................................
