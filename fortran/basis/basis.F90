@@ -10,11 +10,12 @@ MODULE SPI_BASIS
 
 CONTAINS
    ! ...................................................
-   SUBROUTINE CREATE_BASIS(self, ao_mesh, dirname)
+   SUBROUTINE CREATE_BASIS(self, ao_mesh, ao_quad, dirname)
    IMPLICIT NONE
-     CLASS(DEF_BASIS_ABSTRACT)      , INTENT(INOUT) :: self
-     CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: ao_mesh
-     CHARACTER(LEN = 1024), OPTIONAL, INTENT(IN)    :: dirname
+     CLASS(DEF_BASIS_ABSTRACT)         , INTENT(INOUT) :: self
+     CLASS(DEF_MESH_ABSTRACT)          , INTENT(INOUT) :: ao_mesh
+     CLASS(DEF_QUADRATURE_1D), TARGET  , INTENT(INOUT) :: ao_quad
+     CHARACTER(LEN = 1024)   , OPTIONAL, INTENT(IN)    :: dirname
      ! LOCAL
 
      IF (PRESENT(dirname)) THEN
@@ -28,6 +29,8 @@ CONTAINS
      CLASS IS (DEF_BASIS_1D_BSPLINE)
         SELECT TYPE (ao_mesh)
         CLASS IS (DEF_MESH_1D_BSPLINE)
+           self % ptr_quad => ao_quad
+
            CALL CREATE_BASIS_1D_BSPLINE(self, ao_mesh)
         CLASS DEFAULT
            STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
@@ -38,6 +41,8 @@ CONTAINS
      CLASS IS (DEF_BASIS_1D_FOURIER)
         SELECT TYPE (ao_mesh)
         CLASS IS (DEF_MESH_1D_FOURIER)
+           self % ptr_quad => ao_quad
+
            CALL CREATE_BASIS_1D_FOURIER(self, ao_mesh)
         CLASS DEFAULT
            STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
@@ -48,6 +53,8 @@ CONTAINS
      CLASS IS (DEF_BASIS_1D_HBEZIER)
         SELECT TYPE (ao_mesh)
         CLASS IS (DEF_MESH_1D_HBEZIER)
+           self % ptr_quad => ao_quad
+
            CALL CREATE_BASIS_1D_HBEZIER(self, ao_mesh)
         CLASS DEFAULT
            STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'

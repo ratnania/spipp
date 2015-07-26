@@ -99,9 +99,9 @@ CONTAINS
     REAL(KIND=SPI_RK) :: s , t, phi
     INTEGER :: mode(n_tor) 
 
-     ALLOCATE(self % TestfT_0 (self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_p (self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_pp(self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_0 (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_p (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_pp(self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
 
     mode(1)=0
     DO il=2,n_tor
@@ -109,7 +109,7 @@ CONTAINS
     END DO
     
 
-    DO ig = 1, self % ptr_mesh % ptr_quad % oi_n_points
+    DO ig = 1, self % ptr_quad % oi_n_points
 
 
       CALL Compute_fourier_mods(n_tor,n_period,1,phi,self % TestfT_0(ig,1,1))
@@ -117,7 +117,7 @@ CONTAINS
 
         DO il=1,(n_tor-1)/2
   
-        phi= self % ptr_mesh % ptr_quad % opr_points(1,ig)
+        phi= self % ptr_quad % opr_points(1,ig)
         CALL Compute_fourier_mods(n_tor,n_period,2*il,phi,self % TestfT_0(ig,2*il,1))
         CALL Compute_FD_fourier_mods(n_tor,n_period,2*il,phi,self % TestfT_p(ig,2*il,1)) 
         CALL Compute_SD_fourier_mods(n_tor,n_period,2*il,phi,self % TestfT_pp(ig,2*il,1)) 

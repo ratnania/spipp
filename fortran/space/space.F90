@@ -19,19 +19,25 @@ CONTAINS
   ! ..................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_SPACE(self, ao_mesh)
+  SUBROUTINE CREATE_SPACE(self, ao_mesh, ai_type, ai_k)
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD
   IMPLICIT NONE
-     CLASS(DEF_SPACE_ABSTRACT)  , INTENT(INOUT) :: self 
-     CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: ao_mesh 
+     CLASS(DEF_SPACE_ABSTRACT), INTENT(INOUT) :: self 
+     CLASS(DEF_MESH_ABSTRACT) , INTENT(INOUT) :: ao_mesh 
+     INTEGER                  , INTENT(IN)    :: ai_type
+     INTEGER                   , OPTIONAL, INTENT(IN)    :: ai_k
      ! LOCAL
 
      SELECT TYPE (self)
      CLASS IS (DEF_SPACE_1D_BSPLINE)
         SELECT TYPE (ao_mesh)
         CLASS IS (DEF_MESH_1D_BSPLINE)
-           CALL CREATE_SPACE_1D_BSPLINE(self, ao_mesh)
+           IF (PRESENT(ai_k)) THEN
+              CALL CREATE_SPACE_1D_BSPLINE(self, ao_mesh, ai_type, ai_k)
+           ELSE
+              STOP "CREATE_SPACE: Missing argument"
+           END IF
         CLASS DEFAULT
            STOP 'CREATE_SPACE: unexpected type for ao_mesh object!'
         END SELECT
@@ -60,12 +66,19 @@ CONTAINS
   ! .........................................................
 
   ! ........................................................
-  SUBROUTINE CREATE_SPACE_1D_BSPLINE( self, ao_mesh)
+  SUBROUTINE CREATE_SPACE_1D_BSPLINE(self, ao_mesh, ai_type, ai_k)
   implicit none
-     type(DEF_SPACE_1D_BSPLINE),intent(inout) :: self
-     TYPE(DEF_MESH_1D_BSPLINE), TARGET, INTENT(IN) :: ao_mesh
+     type(DEF_SPACE_1D_BSPLINE), intent(inout) :: self
+     TYPE(DEF_MESH_1D_BSPLINE) , TARGET, INTENT(INOUT) :: ao_mesh
+     INTEGER                   , INTENT(IN)    :: ai_type
+     INTEGER                   , INTENT(IN)    :: ai_k
      ! LOCAL VARIABLES
 
+     self % ptr_mesh => ao_mesh
+
+     CALL CREATE_NUMBERING(self % oo_numbering, ao_mesh)
+
+     CALL CREATE_QUADRATURE(self % oo_quad, ai_type, ai_k)
   
   END SUBROUTINE CREATE_SPACE_1D_BSPLINE
   ! ........................................................
@@ -74,9 +87,11 @@ CONTAINS
   SUBROUTINE CREATE_SPACE_1D_FOURIER(self, ao_mesh)
   IMPLICIT NONE
      TYPE(DEF_SPACE_1D_FOURIER), INTENT(INOUT)  :: self
-     TYPE(DEF_MESH_1D_FOURIER), TARGET, INTENT(IN) :: ao_mesh
+     TYPE(DEF_MESH_1D_FOURIER), TARGET, INTENT(INOUT) :: ao_mesh
      ! LOCAL
      INTEGER :: li_err 
+
+     self % ptr_mesh => ao_mesh
 
   END SUBROUTINE CREATE_SPACE_1D_FOURIER
   ! .........................................................
@@ -85,9 +100,11 @@ CONTAINS
   SUBROUTINE CREATE_SPACE_1D_HBEZIER(self, ao_mesh)
   IMPLICIT NONE
      TYPE(DEF_SPACE_1D_HBEZIER), INTENT(INOUT)  :: self
-     TYPE(DEF_MESH_1D_HBEZIER), TARGET, INTENT(IN) :: ao_mesh
+     TYPE(DEF_MESH_1D_HBEZIER), TARGET, INTENT(INOUT) :: ao_mesh
      ! LOCAL
      INTEGER :: li_err 
+
+     self % ptr_mesh => ao_mesh
 
   END SUBROUTINE CREATE_SPACE_1D_HBEZIER
   ! .........................................................
@@ -122,6 +139,9 @@ CONTAINS
    implicit none
       type(DEF_SPACE_1D_BSPLINE),intent(inout) :: self
       ! LOCAL VARIABLES
+
+      CALL FREE_NUMBERING(self % oo_numbering)
+      CALL FREE_QUADRATURE(self % oo_quad)
       
    END SUBROUTINE FREE_SPACE_1D_BSPLINE
    ! ........................................................

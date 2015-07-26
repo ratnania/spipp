@@ -39,7 +39,7 @@ implicit none
    ls_file = "ex_2_matrix.mm"
    
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-   CALL CREATE_MESH(lo_mesh, lo_quad, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
+   CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
    CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
 
    call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n, ai_nel=li_nel )

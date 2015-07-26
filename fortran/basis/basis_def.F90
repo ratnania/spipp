@@ -15,12 +15,13 @@ MODULE SPI_BASIS_DEF
      INTEGER :: oi_nderiv
      CHARACTER(LEN=1024) :: dirname 
 
-     CLASS(DEF_QUADRATURE_ABSTRACT), POINTER :: ptr_quad => NULL()
   END TYPE DEF_BASIS_ABSTRACT
 ! ..........................................................        
 
 ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_ABSTRACT) :: DEF_BASIS_1D
+     CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
+
      REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_0
      REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_p, TestfT_pp 
   END TYPE DEF_BASIS_1D

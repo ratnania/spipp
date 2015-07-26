@@ -155,12 +155,17 @@ CONTAINS
       REAL(SPI_RK) :: lr_value
    
       CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-      CALL CREATE_MESH(lo_mesh, lo_quad, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
-      CALL CREATE_BASIS(lo_basis, lo_mesh) 
+      CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
+      CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
       CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
       CALL CREATE_BLACKBOX(lo_bbox, lo_basis, lo_quad)
       CALL CREATE_GREENBOX(lo_gbox, N_VAR, lo_quad)
       CALL CREATE_MATRIX(lo_matrix)
+
+!      CALL initialize_sparse_matrix_with_LM(lo_A, lo_mesh % oi_n_elmts, &
+!              & lo_numbering % opi_LM, lo_mesh % oi_nen, &
+!              & lo_numbering % opi_LM, lo_mesh % oi_nen)
+
    
       PRINT *, ">>> knots"
       PRINT *, lo_mesh % opr_knot

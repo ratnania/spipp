@@ -13,47 +13,36 @@
 subroutine test1 ()
 USE SPI_GLOBAL_DEF
 USE SPI_GLOBAL
-USE SPI_QUADRATURES_DEF
-USE SPI_QUADRATURES
 USE SPI_MESH_DEF
 USE SPI_MESH
-USE SPI_NUMBERING_DEF
-USE SPI_NUMBERING
+USE SPI_SPACE_DEF
+USE SPI_SPACE
 implicit none
    ! LOCAL
-   TYPE(DEF_QUADRATURE_1D), TARGET :: lo_quad
    TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
-   TYPE(DEF_NUMBERING_1D_BSPLINE), TARGET :: lo_numbering
+   TYPE(DEF_SPACE_1D_BSPLINE), TARGET :: lo_space
+   integer  :: li_n, li_nel
+   real(SPI_RK),dimension(:),pointer :: lpr_x,lpr_y
+   integer  :: li_err,li_flag,li_i,li_j
+   character(len=14) :: ls_file		
    ! ... number of internal knots is = N - P - 1
    INTEGER, PARAMETER :: N = 5 
    INTEGER, PARAMETER :: P = 3
    INTEGER, PARAMETER :: K = 3 
 
-   CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-
+   ls_file = "ex_2_matrix.mm"
+   
    CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
-
-   PRINT *, ">>> knots"
-   PRINT *, lo_mesh % opr_knot
-
-   CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
-
-   PRINT *, ">>> IEN"
-   PRINT *, lo_numbering % opi_IEN
-
-   PRINT *, ">>> LM"
-   PRINT *, lo_numbering % opi_LM
-
-   PRINT *, ">>> ID"
-   PRINT *, lo_numbering % opi_ID
-
-   CALL FREE_QUADRATURE(lo_quad) 
-   CALL FREE_NUMBERING(lo_numbering) 
+   CALL CREATE_SPACE(lo_space, lo_mesh, SPI_QUADRATURES_LEGENDRE, ai_k=K) 
+   
+   ! ... free object
    CALL FREE_MESH(lo_mesh) 
-
+   CALL FREE_SPACE(lo_space)
+   ! ...
+   
 end subroutine test1
 ! ............................................
-   
+
 ! ............................................
 PROGRAM Main
 

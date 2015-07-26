@@ -43,8 +43,8 @@ implicit none
    REAL(SPI_RK) :: lr_value
 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-   CALL CREATE_MESH(lo_mesh, lo_quad, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
-   CALL CREATE_BASIS(lo_basis, lo_mesh) 
+   CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
+   CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
    CALL CREATE_BLACKBOX(lo_bbox, lo_basis, lo_quad)
    CALL CREATE_GREENBOX(lo_gbox, N_VAR, lo_quad)
 

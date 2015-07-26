@@ -1,7 +1,6 @@
 !# -*- coding: utf8 -*-
 MODULE SPI_MESH_DEF
   USE SPI_GLOBAL_DEF
-  USE SPI_QUADRATURES_DEF
   IMPLICIT NONE
 
   ! .........................................................
@@ -30,8 +29,6 @@ MODULE SPI_MESH_DEF
      INTEGER :: oi_nnp
      !> TYPE BOUNDARY CONDITION
      INTEGER :: oi_type_bc
-
-     CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
   END TYPE DEF_MESH_ABSTRACT
   ! .........................................................
 
@@ -58,7 +55,6 @@ MODULE SPI_MESH_DEF
 
       !> KNOT VECTOR FOR EACH DIRECTION
       real(SPI_RK), dimension ( : ), pointer	:: opr_knot
-
   END TYPE DEF_MESH_1D_BSPLINE
   ! .........................................................
 

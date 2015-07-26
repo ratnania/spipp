@@ -8,12 +8,11 @@ MODULE SPI_MESH
 CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH(self, ao_quad, ai_n, ai_p, ai_type_bc, dirname)
+  SUBROUTINE CREATE_MESH(self, ai_n, ai_p, ai_type_bc, dirname)
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD
   IMPLICIT NONE
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: self 
-     CLASS(DEF_QUADRATURE_1D), TARGET, INTENT(IN)   :: ao_quad 
      INTEGER               , OPTIONAL, INTENT(IN)   :: ai_n
      INTEGER               , OPTIONAL, INTENT(IN)   :: ai_p
      INTEGER               , OPTIONAL, INTENT(IN)   :: ai_type_bc
@@ -21,8 +20,6 @@ CONTAINS
      ! LOCAL
      CHARACTER(LEN = 1024) :: ls_dirname
      INTEGER :: li_err     
-
-     self % ptr_quad => ao_quad
 
      IF (PRESENT(dirname)) THEN
         ls_dirname = TRIM(dirname)

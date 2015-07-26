@@ -85,13 +85,13 @@ CONTAINS
      REAL(KIND=SPI_RK) :: s , t, phi
      REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_n_vtex_per_elmt,self % oi_n_order)   :: BT   ,  BT_p , BT_pp
     
-     ALLOCATE(self % TestfT_0 (self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_p (self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_pp(self % ptr_mesh % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_0 (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_p (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
+     ALLOCATE(self % TestfT_pp(self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
     
-     DO ig = 1, self % ptr_mesh % ptr_quad % oi_n_points
+     DO ig = 1, self % ptr_quad % oi_n_points
     
-        phi = self % ptr_mesh % ptr_quad % opr_points(1,ig)
+        phi = self % ptr_quad % opr_points(1,ig)
     
         CALL BasisFunctions1D(phi, self % ptr_mesh % oi_n_vtex_per_elmt, self % oi_n_order, BT, BT_p, BT_pp)
         DO il = 1, self % oi_n_order

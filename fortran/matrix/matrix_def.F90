@@ -8,6 +8,8 @@ MODULE SPI_MATRIX_DEF
   USE SPI_MESH
   USE SPI_NUMBERING_DEF
   USE SPI_NUMBERING
+  USE SPI_SPARSE_MATRIX_DEF
+  USE SPI_SPARSE_MATRIX
   IMPLICIT NONE
 
   PRIVATE
@@ -31,6 +33,8 @@ MODULE SPI_MATRIX_DEF
 
   ! ..................................................
   TYPE, PUBLIC, EXTENDS(DEF_MATRIX_ABSTRACT) :: DEF_MATRIX_1D
+     TYPE(DEF_MATRIX_CSR), POINTER :: ptr_csr
+
      PROCEDURE(matrix_weak_formulation_1D), POINTER :: ptr_matrix_contribution  => NULL ()
      PROCEDURE(rhs_weak_formulation_1D)   , POINTER :: ptr_rhs_contribution     => NULL ()
      PROCEDURE(Assembly_Diagnostics_1D)   , POINTER :: ptr_assembly_diagnostics => NULL ()

@@ -81,8 +81,8 @@ ENDIF(BUILD_TESTS)
 
 ##########################################################################
 add_subdirectory(space)
-#IF(BUILD_TESTS)
-#   add_subdirectory(space/tests)
-#ENDIF(BUILD_TESTS)
+IF(BUILD_TESTS)
+   add_subdirectory(space/tests)
+ENDIF(BUILD_TESTS)
 ##########################################################################
 
