@@ -33,7 +33,7 @@ MODULE SPI_MATRIX_DEF
 
   ! ..................................................
   TYPE, PUBLIC, EXTENDS(DEF_MATRIX_ABSTRACT) :: DEF_MATRIX_1D
-     TYPE(DEF_MATRIX_CSR), POINTER :: ptr_csr
+     TYPE(DEF_MATRIX_CSR) :: oo_csr
 
      PROCEDURE(matrix_weak_formulation_1D), POINTER :: ptr_matrix_contribution  => NULL ()
      PROCEDURE(rhs_weak_formulation_1D)   , POINTER :: ptr_rhs_contribution     => NULL ()

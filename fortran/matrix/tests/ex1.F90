@@ -27,6 +27,8 @@ USE SPI_NUMBERING_DEF
 USE SPI_NUMBERING
 USE SPI_SPARSE_MATRIX_DEF
 USE SPI_SPARSE_MATRIX
+USE SPI_SPACE_DEF
+USE SPI_SPACE
 USE SPI_MATRIX_DEF
 USE SPI_MATRIX
 IMPLICIT NONE
@@ -131,12 +133,9 @@ CONTAINS
    subroutine test1 ()
    implicit none
       ! LOCAL
-      TYPE(DEF_QUADRATURE_1D), TARGET :: lo_quad
       TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
-      TYPE(DEF_BASIS_1D_BSPLINE), TARGET :: lo_basis
-      TYPE(DEF_NUMBERING_1D_BSPLINE), TARGET :: lo_numbering
-      TYPE(DEF_BLACKBOX_1D_BSPLINE), TARGET :: lo_bbox
       TYPE(DEF_GREENBOX_1D), TARGET :: lo_gbox
+      TYPE(DEF_SPACE_1D_BSPLINE), TARGET :: lo_space
       TYPE(DEF_MATRIX_1D), TARGET :: lo_matrix
       ! ... number of internal knots is = N - P - 1
       INTEGER, PARAMETER :: N = 5 
@@ -154,60 +153,31 @@ CONTAINS
       REAL(SPI_RK) :: lr_b
       REAL(SPI_RK) :: lr_value
    
-      CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
       CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
-      CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
-      CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
-      CALL CREATE_BLACKBOX(lo_bbox, lo_basis, lo_quad)
-      CALL CREATE_GREENBOX(lo_gbox, N_VAR, lo_quad)
+      CALL CREATE_SPACE(lo_space, lo_mesh, SPI_QUADRATURES_LEGENDRE, ai_k=K) 
+
+      CALL CREATE_GREENBOX(lo_gbox, N_VAR, lo_space % oo_quad)
       CALL CREATE_MATRIX(lo_matrix)
 
-!      CALL initialize_sparse_matrix_with_LM(lo_A, lo_mesh % oi_n_elmts, &
-!              & lo_numbering % opi_LM, lo_mesh % oi_nen, &
-!              & lo_numbering % opi_LM, lo_mesh % oi_nen)
-
+!      CALL initialize_sparse_matrix_with_LM(lo_matrix % oo_csr, lo_mesh % oi_n_elmts, &
+!              & lo_space % oo_numbering % opi_LM, lo_mesh % oi_nen, &
+!              & lo_space % oo_numbering % opi_LM, lo_mesh % oi_nen)
    
-      PRINT *, ">>> knots"
-      PRINT *, lo_mesh % opr_knot
+!      CALL GET_NR_MATRIX(lo_matrix, li_n_rows) 
+!      CALL GET_NR_MATRIX(lo_matrix, li_n_cols) 
+!   
+!      CALL GLOBAL_TO_INDEX_MATRIX(lo_matrix, li_glob, li_index) 
+!   
+!      lo_matrix % ptr_matrix_contribution => Matrix_for_Vi_Vj
+!      lo_matrix % ptr_rhs_contribution    => RHS_for_Vi
+!   
+!      CALL RESET_GREENBOX(lo_gbox) 
+!  
+!      CALL RESET_ELEMENT_MATRIX(lo_matrix) 
+!      CALL RESET_ELEMENT_RHS_MATRIX(lo_matrix) 
    
-      CALL GET_NR_MATRIX(lo_matrix, li_n_rows) 
-      CALL GET_NR_MATRIX(lo_matrix, li_n_cols) 
-   
-      CALL GLOBAL_TO_INDEX_MATRIX(lo_matrix, li_glob, li_index) 
-   
-      lo_matrix % ptr_matrix_contribution => Matrix_for_Vi_Vj
-      lo_matrix % ptr_rhs_contribution    => RHS_for_Vi
-   
-      CALL RESET_BASIS(lo_basis) 
-      print *, "%%%%"
-      CALL RESET_GREENBOX(lo_gbox) 
-      print *, "%%%%"
-  
-      CALL BLACKBOX_RESET_POSITION(lo_bbox) 
-      print *, "%%%%"
-      CALL RESET_ELEMENT_MATRIX(lo_matrix) 
-      print *, "%%%%"
-      CALL RESET_ELEMENT_RHS_MATRIX(lo_matrix) 
-      print *, "%%%%"
-   
-      li_elmt = 1
-      CALL UPDATE_BASIS(lo_basis, li_elmt) 
-      print *, "%%%%"
-   
-      lr_a = 0.0 ; lr_b = 1.0
-      CALL BLACKBOX_COMPUTE_METRIC(lo_bbox, lr_a, lr_b) 
-      print *, "%%%%"
-   
-      li_i = 1
-      lr_value = 1.0
-      CALL UPDATE_VARIABLES_GREENBOX_1D(lo_gbox, lo_bbox, I_VAR, lr_value, li_i) 
-      print *, "%%%%"
-
-      CALL FREE_QUADRATURE(lo_quad) 
       CALL FREE_MESH(lo_mesh) 
-      CALL FREE_BASIS(lo_basis) 
-      CALL FREE_NUMBERING(lo_numbering) 
-      CALL FREE_BLACKBOX(lo_bbox) 
+      CALL FREE_SPACE(lo_space) 
       CALL FREE_GREENBOX(lo_gbox) 
       CALL FREE_MATRIX(lo_matrix) 
 
