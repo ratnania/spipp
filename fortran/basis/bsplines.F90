@@ -14,6 +14,7 @@
 MODULE SPI_BASIS_BSPLINE 
   USE SPI_BASIS_DEF
   USE SPI_MESH_DEF
+  USE BSP
 
   IMPLICIT NONE
 
@@ -32,12 +33,13 @@ CONTAINS
      CLASS(DEF_MESH_1D_BSPLINE), TARGET, INTENT(INOUT) :: ao_mesh
 
      self % ptr_mesh => ao_mesh
+     self % ptr_knot => ao_mesh % opr_knot 
 
      self % oi_n_order = self % ptr_mesh % oi_p + 1 
-      
 
-!     CALL Init_FE_BasisF1D_Parameters(self)
-     CALL Init_FE_BasisF1D(self)
+     ALLOCATE(self % TestfT_0 (self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
+     ALLOCATE(self % TestfT_p (self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
+     ALLOCATE(self % TestfT_pp(self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
 
    END SUBROUTINE CREATE_BASIS_1D_BSPLINE
    ! ...................................................
@@ -59,83 +61,61 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS_1D_BSPLINE(self, ai_elmt_id)
-    IMPLICIT NONE
+   SUBROUTINE UPDATE_BASIS_1D_BSPLINE(self, apr_points)
+   IMPLICIT NONE
      CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     INTEGER, INTENT(IN)       :: ai_elmt_id
+     REAL(SPI_RK), DIMENSION(:) :: apr_points
+     ! LOCAL
+     INTEGER       :: li_ig
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B     
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_s   
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_ss  
+     INTEGER :: li_n_points
+
+     li_n_points = SIZE(apr_points, 1)
+    
+     DO li_ig = 1, li_n_points
+        CALL EVALUATE_BASIS_1D_BSPLINE(self, apr_points(li_ig), B, B_s, B_ss)
+        self % TestfT_0  (li_ig, :, 1) = B   (:)
+        self % TestfT_p  (li_ig, :, 1) = B_s (:)
+        self % TestfT_pp (li_ig, :, 1) = B_ss(:)
+     END DO
 
    END SUBROUTINE UPDATE_BASIS_1D_BSPLINE
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINE(self)
-   IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
+  SUBROUTINE EVALUATE_BASIS_1D_BSPLINE(self, s, B, B_s, B_ss)
+  IMPLICIT NONE
+    CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
+    !< s-coordinate in the element
+    REAL(KIND=SPI_RK), INTENT(IN)  :: s          
+    !< Basis functions
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B     
+    !< Basis functions derived with respect to s
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B_s   
+    !< Basis functions derived two times with respect to s
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B_ss  
+    ! LOCAL
+    INTEGER, PARAMETER :: N_DERIV = 2
+    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % oi_p, 0:N_DERIV) :: lpr_dbatx
+    INTEGER :: li_span
 
-
-   END SUBROUTINE INITIALIZE_PARAMETERS_BASIS_1D_BSPLINE
-   ! ...................................................
-
-   ! ...................................................
-   SUBROUTINE Init_FE_BasisF1D(self)
-   IMPLICIT NONE
-     CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
-     ! LOCAL
-     INTEGER       :: iv, jv, ig, il
-     REAL(KIND=SPI_RK) :: s , t, phi
-     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_n_vtex_per_elmt,self % oi_n_order)   :: BT   ,  BT_p , BT_pp
+    CALL FindSpan( self % ptr_mesh % oi_p, &
+                 & self % ptr_mesh % oi_n, &
+                 & self % ptr_knot       , &
+                 & s, li_span)
     
-     ALLOCATE(self % TestfT_0 (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_p (self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-     ALLOCATE(self % TestfT_pp(self % ptr_quad % oi_n_points, self % oi_n_order, self % ptr_mesh % oi_n_vtex_per_elmt))
-    
-     DO ig = 1, self % ptr_quad % oi_n_points
-    
-        phi = self % ptr_quad % opr_points(1,ig)
-    
-        CALL BasisFunctions1D(phi, self % ptr_mesh % oi_n_vtex_per_elmt, self % oi_n_order, BT, BT_p, BT_pp)
-        DO il = 1, self % oi_n_order
-           self % TestfT_0  (ig, il, 1:self % ptr_mesh % oi_n_vtex_per_elmt) = BT(1:self % ptr_mesh % oi_n_vtex_per_elmt,il)
-           self % TestfT_p  (ig, il, 1:self % ptr_mesh % oi_n_vtex_per_elmt) = BT_p(1:self % ptr_mesh % oi_n_vtex_per_elmt,il)
-           self % TestfT_pp (ig, il, 1:self % ptr_mesh % oi_n_vtex_per_elmt) = BT_pp(1:self % ptr_mesh % oi_n_vtex_per_elmt,il)
-        END DO
-     END DO
+    CALL EvalBasisFunsDers( self % ptr_mesh % oi_p, &
+                          & self % ptr_mesh % oi_n, &
+                          & self % ptr_knot       , &
+                          & s, N_DERIV, li_span, lpr_dbatx)
 
-   END SUBROUTINE Init_FE_BasisF1D
-   ! ...................................................
+    B(:)    = lpr_dbatx(:,0)
+    B_s(:)  = lpr_dbatx(:,1)
+    B_ss(:) = lpr_dbatx(:,2)
 
-   ! ...................................................
-  SUBROUTINE basisfunctions1D(s, ai_n_vtex_per_elmt_Tor, ai_n_order_Tor,Bt,Bt_s,Bt_ss)
-
-    ! --- Routine parameters
-    REAL(KIND=SPI_RK), INTENT(in)  :: s          !< s-coordinate in the element
-    INTEGER                    :: ai_n_vtex_per_elmt_Tor
-    INTEGER                    :: ai_n_order_Tor
-    REAL(KIND=SPI_RK), INTENT(out) :: Bt(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)     !< Basis functions
-    REAL(KIND=SPI_RK), INTENT(out) :: Bt_s(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)   !< Basis functions derived with respect to s
-    REAL(KIND=SPI_RK), INTENT(out) :: Bt_ss(ai_n_vtex_per_elmt_Tor,ai_n_order_Tor)  !< Basis functions derived two times with respect to s
-
-    !---------------------------------------------------------- vertex (1)
-    Bt   (1,1)=  2.0*(s**3) - 3.0*(s**2) + 1
-    Bt_s (1,1)=  6.0*(s**2) - 6.0*s
-    Bt_ss(1,1)= 12.0*s      - 6.0
-
-    Bt   (1,2)=    (s**3) - 2.0*(s**2) + s
-    Bt_s (1,2)=3.0*(s**2) - 4.0*s      + 1
-    Bt_ss(1,2)=6.0*s      - 4.0
-
-
-    !---------------------------------------------------------- vertex (2)
-    Bt   (2,1)= -  2.0*(s**3) + 3.0*(s**2) 
-    Bt_s (2,1)= -  6.0*(s**2) + 6.0*s
-    Bt_ss(2,1)= - 12.0*s      + 6.0
-
-    Bt   (2,2)=    (s**3) -     (s**2)
-    Bt_s (2,2)=3.0*(s**2) - 2.0*s
-    Bt_ss(2,2)=6.0*s      - 2.0
-
-
-  END SUBROUTINE basisfunctions1D
+  END SUBROUTINE EVALUATE_BASIS_1D_BSPLINE
    ! ...................................................
 
 END MODULE SPI_BASIS_BSPLINE

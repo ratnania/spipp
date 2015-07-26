@@ -114,10 +114,10 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS(self, ai_elmt_id)
+   SUBROUTINE UPDATE_BASIS(self, apr_points)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT), INTENT(INOUT) :: self
-     INTEGER, INTENT(IN)       :: ai_elmt_id
+     REAL(SPI_RK), DIMENSION(:) :: apr_points
      ! LOCAL
 
      ! ...
@@ -125,17 +125,17 @@ CONTAINS
 
      ! ...
      CLASS IS (DEF_BASIS_1D_BSPLINE)
-        CALL UPDATE_BASIS_1D_BSPLINE(self, ai_elmt_id)
+        CALL UPDATE_BASIS_1D_BSPLINE(self, apr_points)
      ! ...
 
      ! ...
      CLASS IS (DEF_BASIS_1D_FOURIER)
-        CALL UPDATE_BASIS_1D_FOURIER(self, ai_elmt_id)
+        CALL UPDATE_BASIS_1D_FOURIER(self, apr_points)
      ! ...
 
      ! ...
      CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL UPDATE_BASIS_1D_HBEZIER(self, ai_elmt_id)
+        CALL UPDATE_BASIS_1D_HBEZIER(self, apr_points)
      ! ...
 
      CLASS DEFAULT

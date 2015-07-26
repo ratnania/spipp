@@ -29,6 +29,8 @@ MODULE SPI_BASIS_DEF
 
 ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_BSPLINE
+     REAL(SPI_RK), DIMENSION(:), POINTER :: ptr_knot => NULL()
+
      CLASS(DEF_MESH_1D_BSPLINE), POINTER :: ptr_mesh => NULL()
   END TYPE DEF_BASIS_1D_BSPLINE
 ! ..........................................................        

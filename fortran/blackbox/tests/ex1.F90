@@ -43,11 +43,6 @@ implicit none
    PRINT *, ">>> knots"
    PRINT *, lo_mesh % opr_knot
 
-   CALL RESET_BASIS(lo_basis) 
-
-   li_elmt = 1
-   CALL UPDATE_BASIS(lo_basis, li_elmt) 
-
    CALL BLACKBOX_RESET_POSITION(lo_bbox) 
 
    lr_a = 0.0 ; lr_b = 1.0

@@ -45,10 +45,10 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS_1D_HBEZIER(self, ai_elmt_id)
+   SUBROUTINE UPDATE_BASIS_1D_HBEZIER(self, apr_points)
     IMPLICIT NONE
      CLASS(DEF_BASIS_1D_HBEZIER), INTENT(INOUT) :: self
-     INTEGER, INTENT(IN)       :: ai_elmt_id
+     REAL(SPI_RK), DIMENSION(:) :: apr_points
 
    END SUBROUTINE UPDATE_BASIS_1D_HBEZIER
    ! ...................................................

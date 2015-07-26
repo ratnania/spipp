@@ -29,6 +29,7 @@ implicit none
    INTEGER, PARAMETER :: P = 3
    INTEGER, PARAMETER :: K = 3 
    INTEGER :: li_elmt
+   REAL(SPI_RK), DIMENSION(3) :: lpr_points
 
    CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K) 
@@ -36,8 +37,14 @@ implicit none
 
    CALL RESET_BASIS(lo_basis) 
 
-   li_elmt = 1
-   CALL UPDATE_BASIS(lo_basis, li_elmt) 
+   lpr_points(1) = 0.2
+   lpr_points(2) = 0.4
+   lpr_points(3) = 0.6
+   CALL UPDATE_BASIS(lo_basis, lpr_points) 
+   
+   PRINT *, lo_basis % TestfT_0
+   PRINT *, lo_basis % TestfT_P
+   PRINT *, lo_basis % TestfT_PP
 
    CALL FREE_BASIS(lo_basis) 
    CALL FREE_MESH(lo_mesh) 

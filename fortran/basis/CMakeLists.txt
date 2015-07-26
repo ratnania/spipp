@@ -16,6 +16,6 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/basis.mod)
 
 add_library(spi_basis SHARED ${files})
-target_link_libraries(spi_basis spi_global spi_quadratures spi_mesh)
+target_link_libraries(spi_basis spi_bspline spi_global spi_quadratures spi_mesh)
 install(TARGETS spi_basis DESTINATION lib)
 ##########################################################################
