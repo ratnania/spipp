@@ -81,10 +81,11 @@ CONTAINS
         self % oi_nnp     = self % oi_n
         self % oi_nen     = ai_p + 1
         
-        ALLOCATE ( self % opr_knot ( self%oi_n + ai_p + 1 ) ) 
+        ALLOCATE ( self % opr_knot ( self % oi_n + ai_p + 1 ) ) 
+        ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
         
         ! INITIALIZING VECTOR KNOTS
-        call init_knotvector( self, ai_type_bc )		
+        call INIT_MESH_1D_BSPLINE( self, ai_type_bc )		
      ELSE
         STOP "Wrong arguments"
      END IF
@@ -172,32 +173,41 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  subroutine init_knotvector ( self, ai_type )
+  subroutine INIT_MESH_1D_BSPLINE ( self, ai_type )
   implicit none
      TYPE(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: self
      integer  :: ai_type
      ! LOCAL VARIABLES
      integer  :: li_i
      integer  :: li_nu ! number of continuity condition for periodic vector knot		
-     real(SPI_RK), dimension ( self%oi_n + self%oi_p + 1 ) :: lpr_knot
+     real(SPI_RK), dimension ( self % oi_n + self % oi_p + 1 ) :: lpr_knot
 
-     if ( self%oi_n < self%oi_p + 1 ) then
-        STOP "Error init_knotvector: you must have N >= p + 1"
+     if ( self % oi_n < self % oi_p + 1 ) then
+        STOP "Error INIT_MESH_1D_BSPLINE: you must have N >= p + 1"
      end if
      
-     self%opr_knot ( 1 : self%oi_p + 1 ) = 0.0
-     do li_i = 1, self%oi_n - self%oi_p - 1
-        self%opr_knot ( self%oi_p + 1 + li_i ) = li_i * 1.0 / ( self%oi_n - self%oi_p )
+     ! ... knots
+     self % opr_knot ( 1 : self % oi_p + 1 ) = 0.0
+     do li_i = 1, self % oi_n - self % oi_p - 1
+        self % opr_knot ( self % oi_p + 1 + li_i ) = li_i * 1.0 / ( self % oi_n - self % oi_p )
      end do 
-     self%opr_knot ( self%oi_n + 1 : self%oi_n + self%oi_p + 1 ) = 1.0
+     self % opr_knot ( self % oi_n + 1 : self % oi_n + self % oi_p + 1 ) = 1.0
                                      
      if ( ai_type == SPI_BC_PERIODIC ) then
-        li_nu = self%oi_p
+        li_nu = self % oi_p
         
-        lpr_knot ( : ) = self%opr_knot ( : )
-        call convert_to_periodic_knots ( lpr_Knot ( : ), self%oi_n, self%oi_p, li_nu, self%opr_knot ( : ) )
+        lpr_knot ( : ) = self % opr_knot ( : )
+        call convert_to_periodic_knots ( lpr_Knot ( : ), self % oi_n, self % oi_p, li_nu, self % opr_knot ( : ) )
      end if
-  end subroutine init_knotvector
+     ! ...
+
+     ! ... control points
+     self % opr_control_points = 0.0
+     do li_i = 1, self % oi_n 
+        self % opr_control_points( li_i ) = (li_i - 1) * 1.0 / (self % oi_n - 1)
+     end do 
+     ! ...
+  end subroutine INIT_MESH_1D_BSPLINE
   ! .........................................................
 
   ! .........................................................
@@ -252,10 +262,10 @@ CONTAINS
 !
 !    SELECT CASE(ai_toroidal_basis)
 !       CASE(INT_TOROIDAL_BASIS_HBEZIER) 
-!          ALLOCATE(self%AngleT  ( ai_n_nodes_Tor+1) )
+!          ALLOCATE(self % AngleT  ( ai_n_nodes_Tor+1) )
 !
 !       CASE(INT_TOROIDAL_BASIS_FOURIER) 
-!          ALLOCATE(self%AngleT  ( ai_n_plane_Tor) )
+!          ALLOCATE(self % AngleT  ( ai_n_plane_Tor) )
 !    END SELECT
 !
 !#ifdef DEBUG_TRACE 
@@ -323,14 +333,14 @@ CONTAINS
 !          Dphi = 2.0*Pi/REAL(self % oi_n_nodes)
 !
 !          DO iplan = 1, self % oi_n_nodes+1
-!             self%AngleT(iplan) = REAL( iplan -1)*Dphi
+!             self % AngleT(iplan) = REAL( iplan -1)*Dphi
 !          END DO
 !
 !       CASE(INT_TOROIDAL_BASIS_FOURIER) 
 !          Dphi = 2.0*Pi/REAL(self % oi_n_plane)
 !
 !          DO iplan = 1, self % oi_n_plane
-!             self%AngleT(iplan) = REAL( iplan -1)*Dphi
+!             self % AngleT(iplan) = REAL( iplan -1)*Dphi
 !          END DO
 !    END SELECT
 !

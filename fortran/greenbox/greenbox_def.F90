@@ -11,7 +11,9 @@ MODULE SPI_GREENBOX_DEF
 
   ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_GREENBOX_ABSTRACT) :: DEF_GREENBOX_1D
+     ! ... Variable
      REAL(KIND=SPI_RK), DIMENSION(:,:), ALLOCATABLE :: VarN_0  
+     ! ...
 
      ! ... Logical Derivatives
      REAL(KIND=SPI_RK), DIMENSION(:,:), ALLOCATABLE :: VarN_s1

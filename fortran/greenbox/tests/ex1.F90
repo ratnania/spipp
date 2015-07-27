@@ -57,7 +57,7 @@ implicit none
    CALL BLACKBOX_RESET_POSITION(lo_bbox) 
 
    lr_a = 0.0 ; lr_b = 1.0
-   CALL BLACKBOX_COMPUTE_METRIC(lo_bbox, lr_a, lr_b) 
+   CALL COMPUTE_METRIC_BLACKBOX(lo_bbox, lr_a, lr_b) 
 
    li_i = 1
    lr_value = 1.0

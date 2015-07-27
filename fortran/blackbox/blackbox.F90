@@ -187,7 +187,7 @@ MODULE SPI_BLACKBOX
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE BLACKBOX_COMPUTE_METRIC(self, ar_a, ar_b, Nutor)
+  SUBROUTINE COMPUTE_METRIC_BLACKBOX(self, ar_a, ar_b, Nutor)
   ! ... TODO subroutine signature to change with the 1D elements object
   IMPLICIT NONE
      CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
@@ -206,14 +206,14 @@ MODULE SPI_BLACKBOX
         IF (PRESENT(Nutor)) THEN 
            CALL COMPUTE_METRIC_BLACKBOX_1D_FOURIER(self, ar_a, ar_b, Nutor)
         ELSE
-           STOP "BLACKBOX_COMPUTE_METRIC: missing argument"
+           STOP "COMPUTE_METRIC_BLACKBOX: missing argument"
         END IF
      CLASS DEFAULT
         STOP 'COMPUTE_METRIC_BLACKBOX: unexpected type for self object!'
      END SELECT
      ! ...
 
-  END SUBROUTINE BLACKBOX_COMPUTE_METRIC 
+  END SUBROUTINE COMPUTE_METRIC_BLACKBOX 
   ! .........................................................
 
   ! ........................................................
@@ -278,14 +278,14 @@ MODULE SPI_BLACKBOX
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE BLACKBOX_UPDATE_PHYSICAL_BASIS(self)
+  SUBROUTINE UPDATE_PHYSICAL_BASIS_BLACKBOX(self)
    IMPLICIT NONE
-    TYPE(DEF_BLACKBOX_1D), INTENT(INOUT) :: self
+    CLASS(DEF_BLACKBOX_ABSTRACT), INTENT(INOUT) :: self
 
     self % B_x1   = self % B_s1   /  self % Vol
     self % B_x1x1 = self % B_s1s1 / (self % Vol**2)
 
-  END SUBROUTINE BLACKBOX_UPDATE_PHYSICAL_BASIS 
+  END SUBROUTINE UPDATE_PHYSICAL_BASIS_BLACKBOX 
   ! .........................................................
 
   ! .........................................................
@@ -296,7 +296,7 @@ MODULE SPI_BLACKBOX
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE BLACKBOX_COMPUTE_POSITION(self, ar_a, ar_b)
+  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX(self, ar_a, ar_b)
   IMPLICIT NONE
      CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
      REAL(SPI_RK)                   , INTENT(IN)    :: ar_a
@@ -306,21 +306,21 @@ MODULE SPI_BLACKBOX
      ! ...
      SELECT TYPE (self)
      CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
-        CALL COMPUTE_POSITION_BLACKBOX_1D_BSPLINE(self, ar_a, ar_b)
+        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE(self, ar_a, ar_b)
      CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
-        CALL COMPUTE_POSITION_BLACKBOX_1D_HBEZIER(self, ar_a, ar_b)
+        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_HBEZIER(self, ar_a, ar_b)
      CLASS IS (DEF_BLACKBOX_1D_FOURIER)
-        CALL COMPUTE_POSITION_BLACKBOX_1D_FOURIER(self, ar_a, ar_b)
+        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_FOURIER(self, ar_a, ar_b)
      CLASS DEFAULT
-        STOP 'COMPUTE_POSITION_BLACKBOX: unexpected type for self object!'
+        STOP 'UPDATE_LOGICAL_POSITION_BLACKBOX: unexpected type for self object!'
      END SELECT
      ! ...
 
-  END SUBROUTINE BLACKBOX_COMPUTE_POSITION 
+  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX 
   ! .........................................................
 
   ! ........................................................
-  SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_BSPLINE(self, ar_a, ar_b)
+  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE(self, ar_a, ar_b)
   implicit none
      type(DEF_BLACKBOX_1D_BSPLINE), INTENT(INOUT) :: self
      REAL(SPI_RK)                 , INTENT(IN)    :: ar_a
@@ -331,11 +331,11 @@ MODULE SPI_BLACKBOX
 
      self % Xp_0(1,:)   = ar_a + self % ptr_quad % opr_points(1,:) * (ar_b - ar_a )
 
-  END SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_BSPLINE
+  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE
   ! ........................................................
 
   ! .........................................................
-  SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_FOURIER(self, ar_a, ar_b)
+  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_FOURIER(self, ar_a, ar_b)
   IMPLICIT NONE
      TYPE(DEF_BLACKBOX_1D_FOURIER), INTENT(INOUT) :: self
      REAL(SPI_RK)                 , INTENT(IN)    :: ar_a
@@ -346,11 +346,11 @@ MODULE SPI_BLACKBOX
 
      self % Xp_0(1,:)   =  self % ptr_quad % opr_points(1,:)
 
-  END SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_FOURIER
+  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_FOURIER
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_HBEZIER(self, ar_a, ar_b)
+  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_HBEZIER(self, ar_a, ar_b)
   IMPLICIT NONE
      TYPE(DEF_BLACKBOX_1D_HBEZIER), INTENT(INOUT)  :: self
      REAL(SPI_RK)                 , INTENT(IN)    :: ar_a
@@ -361,22 +361,136 @@ MODULE SPI_BLACKBOX
 
      self % Xp_0(1,:)   = ar_a + self % ptr_quad % opr_points(1,:) * (ar_b - ar_a )
 
-  END SUBROUTINE COMPUTE_POSITION_BLACKBOX_1D_HBEZIER
+  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_HBEZIER
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE BLACKBOX_GET_BASIS(self, or_tor1, iv_tor1)
-   IMPLICIT NONE
-    TYPE(DEF_BLACKBOX_1D), INTENT(INOUT) :: self
-    INTEGER, INTENT(IN) :: or_tor1
-    INTEGER, INTENT(IN) :: iv_tor1
-    ! LOCAL
+  SUBROUTINE GET_BASIS_BLACKBOX(self, ai_loc)
+  IMPLICIT NONE
+     CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
+     INTEGER, INTENT(IN) :: ai_loc
+     ! LOCAL
+
+     ! ...
+     SELECT TYPE (self)
+     CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
+        CALL GET_BASIS_BLACKBOX_1D_BSPLINE(self, ai_loc)
+     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
+        CALL GET_BASIS_BLACKBOX_1D_HBEZIER(self)
+     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
+        CALL GET_BASIS_BLACKBOX_1D_FOURIER(self)
+     CLASS DEFAULT
+        STOP 'GET_BASIS_BLACKBOX: unexpected type for self object!'
+     END SELECT
+     ! ...
+
+  END SUBROUTINE GET_BASIS_BLACKBOX 
+  ! .........................................................
+
+  ! ..........................................................        
+  SUBROUTINE GET_BASIS_BLACKBOX_1D_BSPLINE(self, ai_loc)
+  IMPLICIT NONE
+     CLASS(DEF_BLACKBOX_1D_BSPLINE) :: self
+     INTEGER, INTENT(IN) :: ai_loc
+     ! LOCAL
 
 !    self % B_0    (:) = self % ptr_basis % TestFT_0 (:, or_tor1, iv_tor1)
 !    self % B_s1   (:) = self % ptr_basis % TestFT_p (:, or_tor1, iv_tor1)
 !    self % B_s1s1 (:) = self % ptr_basis % TestFT_pp(:, or_tor1, iv_tor1)
 
-  END SUBROUTINE BLACKBOX_GET_BASIS 
+  END SUBROUTINE GET_BASIS_BLACKBOX_1D_BSPLINE
+  ! ..........................................................  
+
   ! .........................................................
+  SUBROUTINE GET_BASIS_BLACKBOX_1D_FOURIER(self)
+  IMPLICIT NONE
+     TYPE(DEF_BLACKBOX_1D_FOURIER), INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: kg
+     INTEGER :: li_err
+
+  END SUBROUTINE GET_BASIS_BLACKBOX_1D_FOURIER
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE GET_BASIS_BLACKBOX_1D_HBEZIER(self)
+  IMPLICIT NONE
+     TYPE(DEF_BLACKBOX_1D_HBEZIER), INTENT(INOUT)  :: self
+     ! LOCAL
+     INTEGER :: kg
+     INTEGER :: li_err
+
+  END SUBROUTINE GET_BASIS_BLACKBOX_1D_HBEZIER
+  ! .........................................................
+
+
+
+  ! .........................................................
+  SUBROUTINE UPDATE_POSITION_BLACKBOX(self, apr_control_point)
+  IMPLICIT NONE
+     CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
+     REAL(SPI_RK), DIMENSION(:), OPTIONAL :: apr_control_point
+     ! LOCAL
+
+     ! ...
+     SELECT TYPE (self)
+     CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
+        IF (PRESENT(apr_control_point)) THEN 
+           CALL UPDATE_POSITION_BLACKBOX_1D_BSPLINE(self, apr_control_point)
+        ELSE
+           STOP "UPDATE_POSITION_BLACKBOX: Wrong arguments"
+        END IF
+     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
+        CALL UPDATE_POSITION_BLACKBOX_1D_HBEZIER(self)
+     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
+        CALL UPDATE_POSITION_BLACKBOX_1D_FOURIER(self)
+     CLASS DEFAULT
+        STOP 'UPDATE_POSITION_BLACKBOX: unexpected type for self object!'
+     END SELECT
+     ! ...
+
+  END SUBROUTINE UPDATE_POSITION_BLACKBOX 
+  ! .........................................................
+
+  ! ..........................................................        
+  SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_BSPLINE(self, apr_control_point)
+  IMPLICIT NONE
+     CLASS(DEF_BLACKBOX_1D_BSPLINE) :: self
+     REAL(SPI_RK), DIMENSION(:) :: apr_control_point
+     INTEGER :: ai_i
+     ! LOCAL
+     INTEGER :: ijg
+
+    DO ijg = 1, self % ptr_quad % oi_n_points
+       self % Xp_0   (:, ijg) = self % Xp_0   (:, ijg) + self % B_0(ijg)    * apr_control_point(:)
+       self % Xp_s1  (:, ijg) = self % Xp_s1  (:, ijg) + self % B_s1(ijg)   * apr_control_point(:)
+       self % Xp_s1s1(:, ijg) = self % Xp_s1s1(:, ijg) + self % B_s1s1(ijg) * apr_control_point(:)
+    END DO
+
+  END SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_BSPLINE
+  ! ..........................................................  
+
+  ! .........................................................
+  SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_FOURIER(self)
+  IMPLICIT NONE
+     TYPE(DEF_BLACKBOX_1D_FOURIER), INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: kg
+     INTEGER :: li_err
+
+  END SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_FOURIER
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_HBEZIER(self)
+  IMPLICIT NONE
+     TYPE(DEF_BLACKBOX_1D_HBEZIER), INTENT(INOUT)  :: self
+     ! LOCAL
+     INTEGER :: kg
+     INTEGER :: li_err
+
+  END SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_HBEZIER
+  ! .........................................................
+
 
 END MODULE SPI_BLACKBOX

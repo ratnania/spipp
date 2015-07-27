@@ -37,7 +37,7 @@ CONTAINS
     INTEGER                   :: ivar, ipos
     INTEGER                   :: ipol1, iv_pol1, or_pol1
     INTEGER                   :: ipol2, iv_pol2, or_pol2
-    INTEGER                   :: i_loc1, i_loc2
+    INTEGER                   :: li_loc_1, li_loc_2
     INTEGER                   :: ierr
     INTEGER                   :: i_glob
     INTEGER                   :: i_real
@@ -46,20 +46,25 @@ CONTAINS
     INTEGER                   :: li_locsize
     INTEGER                   :: li_root
     INTEGER                   :: li_i 
+    INTEGER                   :: li_var
     INTEGER                   :: nivar
     INTEGER                   :: njvar
-    INTEGER                   :: ivar_V
     INTEGER                   :: nivar_V
     INTEGER                   :: li_mesh
 
-    REAL(KIND=SPI_RK) :: lr_value
+    REAL(KIND=SPI_RK)         :: lr_value
+    REAL(KIND=SPI_RK)         :: lr_a
+    REAL(KIND=SPI_RK)         :: lr_b
+    REAL(KIND=SPI_RK)         :: lr_delta
 
-    REAL(KIND=SPI_RK)   , DIMENSION(2)           :: Xis
+    REAL(KIND=SPI_RK), DIMENSION(2)           :: Xis
+    REAL(KIND=SPI_RK), DIMENSION(ao_mesh % oi_n_dim) :: lpr_control_point 
 
     INTEGER, PARAMETER :: N_DIM = 2
     INTEGER       :: ijg
     INTEGER       :: li_ctrl_pt
     INTEGER, PARAMETER :: li_one = 1
+    REAL(SPI_RK), DIMENSION(ao_trial_space % oo_quad % oi_n_points) :: lpr_points
     ! ----------------------------------------------------------------------
     ! ---------     END of Local Declarations  and Specifications ----------
     ! ----------------------------------------------------------------------
@@ -127,169 +132,109 @@ CONTAINS
        ! ------------------------------------------ Loops on i ddl
        ! Loop on poloidal vertices (i)
        ! -------------------------------------------------------------------
-!       DO i_loc1 = 1, lp_elmt % oi_nen
-!          Scale2D = 1.0 ! lp_elmt % Scales(or_pol1, iv_pol1)
-!          li_ctrl_pt = lp_elmt % opi_vertices_sons(i_loc1)
-!
-!          CALL getPoloidalBasisFunction(i_loc1, li_one, &
-!                                       & Scale2D, &
-!                                       & lo_BBox2Di)
-!
-!          ! R and Z coordinates and derivatives at Gauss points
-!          ! ---------------------------------------------------- BEGIN
-!          Xis = ao_mesh % TheNodes_bezier % Coor2D(1:N_dim, li_ctrl_pt, li_one)
-!!          print *, "i_loc1, li_ctrl_pt",i_loc1, li_ctrl_pt
-!!          print *, "control point ", li_ctrl_pt, Xis
-!          CALL updatePoloidalPosition(i_loc1, li_one, & 
-!               & Scale2D, Xis, &
-!               & lp_elmt % coo_transf_A(:,:), &
-!               & lp_elmt % coo_transf_b(:), &
-!               & lo_BBox2Di)
-!          ! ---------------------------------------------------- END
-!
-!          ! -------------------------------------------------------------------
-!          ipos   = lp_elmt % opi_LocToGlob(i_loc1)
-!          matrix_field_cell => ao_hashtab_matrix_field % Next
-!          DO WHILE( ASSOCIATED(matrix_field_cell) )
-!             ao_matrix_V => matrix_field_cell % ao_matrix
-!             ptr_field_V  => matrix_field_cell % ptr_field
-!
-!             ivar_V  = matrix_field_cell % oi_loc_id 
-!             nivar_V = ao_matrix_V % oi_nvar
-!
-!     
-!
-!             i_glob = Iddl(ivar_V, ipos, nivar)
-!             CALL MATRIX_GET_GLOBAL_ROW_INDEX(ao_matrix_V, i_glob, i_real)
-!
-!	     i_glob = i_real
-!	     IF (i_glob > 0) THEN
-!                DO ijg = 1, ao_mesh % ptr_quad % oi_n_points
-!
-!                   lo_BBox2Di % ijg = ijg
-! 
-!                   lr_value = ao_matrix_V % opr_global_unknown(i_glob)
-!                   CALL UPDATE_VARIABLES_GREENBOX_2D(ao_gbox, lo_BBox2Di, ptr_field_V % oi_id, lr_value)
-!
-!                END DO 
-!	     END IF
-!          
-!             matrix_field_cell => matrix_field_cell % Next
-!          END DO
-!          ! -------------------------------------------------------------------
-!       END DO
-!       ! End of Loops 
-!       ! -------------------------------------------------------------------
-!      
-!       CALL Reset_Local_Data()
-!
-!       CALL UPDATE_BASIS(ao_Basis2Di, ao_mesh, li_elmt_id)
-!       CALL UPDATE_BASIS(ao_Basis2Dj, ao_mesh, li_elmt_id)
-!        
-!       ! -------------------------------------------------------------------
-!       !  Put here nonlinear functions of variables computed at gauss points
-!       !  Equation of state should be here
-!       ! -------------------------------------------------------------------
-!       CALL MappingGeom_At_GaussPt(lo_BBox2Di)
-!       ! -------------------------------------------------------------------
-!
-!       ! -------------------------------------------------------------------
-!       !  Compute unknowns gradient in the physical domain 
-!       ! -------------------------------------------------------------------
-!       CALL Physical_Variables_Pol(lo_BBox2Di, ao_gbox)
-!       ! -------------------------------------------------------------------
-!
-!       ! ------------------------------------------ Loops on i ddl
-!       ! Loop on poloidal vertices (i)
-!       ! -------------------------------------------------------------------
-!
-!       DO i_loc1 = 1, lp_elmt % oi_nen
-!          Scale2Di = 1.0 ! lp_elmt % Scales(or_pol1, iv_pol1)
-!
-!          ! -------------------------------------------------
-!          CALL getPoloidalBasisFunction(i_loc1, li_one, &
-!                                       & Scale2Di, &
-!                                       & lo_BBox2Di)
-!
-!          CALL Physical_BasisFunction_Pol( &
-!                  & lo_BBox2Di)
-!          ! -------------------------------------------------
-!          IF ( to_assemble_rhs ) THEN
-!             ! -------------------------------------------------------------------
-!             ! Loops on Gauss points
-!             ! -------------------------------------------------------------------
-!             ! TODO remove the loop from here. must be done inside RHS_for_Vi
-!             DO ijg = 1,ao_mesh % ptr_quad % oi_n_points
-!                lo_BBox2Di % ijg = ijg
-!    
-!                ! -------------------------------------------------
-!                ! ---------------------------------------------
-!                ! ---------------------------------------------
-!                ! here RHS bloc-Vector  to be completed 
-!                ! this RHS is associated  to 
-!                !     i == (ipol1, itor1, or_pol1, or_tor1)
-!                ! ---------------------------------------------
-!                ! ---------------------------------------------
-!                CALL ao_matrix % ptr_rhs_contribution(lo_BBox2Di, ao_gbox)
-!                IF (ISNAN(ao_matrix % Rhs_Contribution(1))) THEN
-!                   ao_matrix % Rhs_Contribution = 1.0E14 
-!                END IF
+       ! TODO
+       lr_a = 0.0 
+       lr_b = 1.0
+       lr_delta = lr_b - lr_a
+       CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, lr_a, lr_b)
+       DO li_loc_1 = 1, ao_mesh % oi_nen
+          ! TODO
+          lpr_control_point = 0.0
+          CALL UPDATE_POSITION_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, lpr_control_point) 
+
+          DO li_var = 1, ao_gbox % oi_nvar 
+             ! TODO
+             lr_value = 1.0
+             CALL UPDATE_VARIABLES_GREENBOX_1D(ao_gbox, ao_trial_space % oo_bbox, li_var, lr_value, li_elmt_id) 
+          END DO
+       END DO
+       ! End of Loops 
+       ! -------------------------------------------------------------------
+      
+       CALL Reset_Local_Data()
+
+       ! TODO
+       lpr_points = 0.0
+       CALL UPDATE_BASIS(ao_trial_space % oo_basis, lpr_points) 
+       CALL UPDATE_BASIS(ao_test_space  % oo_basis, lpr_points) 
+
+       CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, lr_a, lr_b)
+       CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_test_space  % oo_bbox, lr_a, lr_b)
+
+       CALL BLACKBOX_UPDATE_PHYSICAL_BASIS(ao_trial_space % oo_bbox) 
+
+       ! ... TODO: add here coordinates system update (not sure be needed)
+       ! ...
+
+       ! ... TODO: add here pushback variables update       
+       ! ...
+
+
+       ! ... loop over non vanishing basis functions
+       DO li_loc_1 = 1, ao_mesh % oi_nen
+          ! ... get the local basis
+          CALL GET_BASIS_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, li_loc_1) 
+          ! ...
+
+          ! ... update basis in the physical domain
+          CALL UPDATE_PHYSICAL_BASIS_BLACKBOX(ao_trial_space % oo_bbox) 
+          ! ...
+
+          ! ............................................. 
+          !     here RHS bloc-Vector  to be completed 
+          ! ............................................. 
+          IF ( to_assemble_rhs ) THEN
+             ! ... Call the weak formulation for the RHS 
+             CALL ao_matrix % ptr_rhs_contribution(ao_gbox)
+             ! ...
+
+             IF (ISNAN(ao_matrix % Rhs_Contribution(1))) THEN
+                ao_matrix % Rhs_Contribution = 1.0E14 
+             END IF
+             
+!             CALL SPM_ASSEMBLYRHSADDVALUES_LOCAL(ao_matrix % oi_matrix_id, li_loc_1, &
+!                     & ao_matrix % Rhs_Contribution, ierr)
+             
+             ! ... reset RHS contribution array
+             CALL MATRIX_RESET_ELEMENT_RHS(ao_matrix)
+             ! ...
+          END IF
+          ! ............................................. 
+
+          IF ( to_assemble_matrix ) THEN
+             DO li_loc_2 = 1, ao_mesh % oi_nen
+                ! ... get the local basis
+                CALL GET_BASIS_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, li_loc_2) 
+                ! ...
+
+                ! ... update basis in the physical domain
+                CALL UPDATE_PHYSICAL_BASIS_BLACKBOX(ao_test_space % oo_bbox) 
+                ! ...
+
+                ! ... Call the weak formulation for the matrix
+                CALL ao_matrix % ptr_matrix_contribution(ao_gbox)
+                ! ...
+                
+                IF (ISNAN(ao_matrix % Matrix_Contribution(1,1))) THEN
+                   ao_matrix % Matrix_Contribution = 1.0E14
+                END IF
 !                
-!                CALL SPM_ASSEMBLYRHSADDVALUES_LOCAL(ao_matrix % oi_matrix_id, i_loc1, &
-!                        & ao_matrix % Rhs_Contribution, ierr)
-!               
-!                ! ... reset RHS contribution array
-!                CALL MATRIX_RESET_ELEMENT_RHS(ao_matrix)
-!                ! ...
-!             END DO 
-!             ! -------------------------------------------------------------------
-!          END IF
-!
-!          IF ( to_assemble_matrix ) THEN
-!             DO i_loc2 = 1, lp_elmt % oi_nen
-!                Scale2Dj = 1.0 ! lp_elmt % Scales(or_pol2, iv_pol2)
-!                
-!                ! -------------------------------------------------
-!                CALL getPoloidalBasisFunction(i_loc2, li_one, &
-!                                             & Scale2Dj, &
-!                                             & lo_BBox2Dj)
-!                
-!                CALL Physical_BasisFunction_Pol( &
-!                        & lo_BBox2Dj)
-!                ! -------------------------------------------------
-!                
-!                ! -------------------------------------------------------------------
-!                ! Loops on Gauss points
-!                ! -------------------------------------------------------------------
-!                ! TODO remove the loop from here. must be done inside Matrix_for_Vi_Vj
-!                DO ijg = 1,ao_mesh % ptr_quad % oi_n_points
-!                   lo_BBox2Di % ijg = ijg
-!               
-!                   CALL ao_matrix % ptr_matrix_contribution(lo_BBox2Di, lo_BBox2Dj, ao_gbox)
-!                
-!                   IF (ISNAN(ao_matrix % Matrix_Contribution(1,1))) THEN
-!                      ao_matrix % Matrix_Contribution = 1.0E14
-!                    END IF
-!                    
-!                    CALL SPM_ASSEMBLYADDVALUES_LOCAL(ao_matrix % oi_matrix_id, i_loc1, i_loc2, &
-!                            & ao_matrix % Matrix_Contribution, ierr)
-!                    
-!                    ! ... reset Matrix contribution array
-!                    CALL MATRIX_RESET_ELEMENT_MATRIX(ao_matrix)
-!                    ! ...
-!                 END DO 
-!                 ! -------------------------------------------------------------------
-!                END DO
-!             END IF
-!
-!       END DO
-!       ! -------------------------------------------------------------------
-!
-!     
-!       ! -- UPDATE RHS AND MATRICES FROM LOCAL-RHS
-!       nivar = ao_matrix % oi_nvar 
-!       njvar = nivar 
-!
+!                CALL SPM_ASSEMBLYADDVALUES_LOCAL(ao_matrix % oi_matrix_id, li_loc_1, li_loc_2, &
+!                        & ao_matrix % Matrix_Contribution, ierr)
+                
+                ! ... reset Matrix contribution array
+                CALL MATRIX_RESET_ELEMENT_MATRIX(ao_matrix)
+                ! ...
+                END DO
+             END IF
+
+       END DO
+       ! -------------------------------------------------------------------
+     
+       ! -- UPDATE RHS AND MATRICES FROM LOCAL-RHS
+       nivar = ao_matrix % oi_nvar 
+       njvar = nivar 
+
 !       CALL GET_LTOG(ao_mesh, ie_Pol, &
 !               & mpi_ltog_rows, mpi_ltog_cols, mpi_ltog_rhsrows &
 !               , nivar, njvar)
@@ -307,25 +252,15 @@ CONTAINS
        ! -- 
 
     END DO 
-!    ! -------------------------------------------------------------------
-!    ! -------------------------------------------------------------------
-!
-!    ! ----------------------------------------------------
-!    ! End of the Assembly process
-!    ! ----------------------------------------------------
+    ! -------------------------------------------------------------------
+    ! -------------------------------------------------------------------
+
+    ! ----------------------------------------------------
+    ! End of the Assembly process
+    ! ----------------------------------------------------
     CALL ASSEMBLYEND_MATRIX(ao_matrix)
-!    ! ----------------------------------------------------
-!
-!    ! ... get the RHS from SPM
-!    !     here we get the global RHS, 
-!    !     for the moment ROOT argument is not used
-!    !     the local RHS (for the owener proc) can be accessed by SPM_GetLocalRHS
-!    IF (to_assemble_rhs) THEN
-!       li_root = -1
-!       CALL SPM_GetGlobalRHS(ao_matrix % oi_matrix_id, ao_matrix % opr_global_rhs, li_root, ierr)
-!    END IF
-!    ! ...
-!
+    ! ----------------------------------------------------
+
     IF (ml_assembly_initialized) THEN
        DEALLOCATE(mpi_ltog_rhsrows)
        DEALLOCATE(mpi_ltog_rows)
@@ -338,12 +273,12 @@ CONTAINS
     ! -------------------------------------------------------------------
     SUBROUTINE Reset_Local_Data()
       IMPLICIT NONE
-!      IF ( to_assemble_matrix ) THEN
-!         CALL SPM_MATRIXRESET_LOCAL(ao_matrix % oi_matrix_id, ierr)
-!      END IF
-!      IF ( to_assemble_rhs ) THEN
-!         CALL SPM_RHSRESET_LOCAL(ao_matrix % oi_matrix_id, ierr)
-!      END IF
+      IF ( to_assemble_matrix ) THEN
+         CALL RESET_ELEMENT_MATRIX(ao_matrix)
+      END IF
+      IF ( to_assemble_rhs ) THEN
+         CALL RESET_ELEMENT_RHS_MATRIX(ao_matrix)
+      END IF
     END SUBROUTINE Reset_Local_Data
     ! -------------------------------------------------------------------
 

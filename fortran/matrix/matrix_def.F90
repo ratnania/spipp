@@ -60,14 +60,11 @@ MODULE SPI_MATRIX_DEF
 
   ! ..................................................
   INTERFACE
-     SUBROUTINE matrix_weak_formulation_1D(self, ao_bboxi, ao_bboxj, ao_gbox)
-       USE SPI_BLACKBOX_DEF
+     SUBROUTINE matrix_weak_formulation_1D(self, ao_gbox)
        USE SPI_GREENBOX_DEF
        IMPORT DEF_MATRIX_1D
 
        CLASS(DEF_MATRIX_1D)  :: self
-       TYPE(DEF_BLACKBOX_1D) :: ao_bboxi
-       TYPE(DEF_BLACKBOX_1D) :: ao_bboxj
        TYPE(DEF_GREENBOX_1D) :: ao_gbox
      END SUBROUTINE matrix_weak_formulation_1D
   END INTERFACE
@@ -75,13 +72,11 @@ MODULE SPI_MATRIX_DEF
 
   ! ..................................................
   INTERFACE
-     SUBROUTINE rhs_weak_formulation_1D(self, ao_bbox, ao_gbox)
-       USE SPI_BLACKBOX_DEF
+     SUBROUTINE rhs_weak_formulation_1D(self, ao_gbox)
        USE SPI_GREENBOX_DEF
        IMPORT DEF_MATRIX_1D
 
        CLASS(DEF_MATRIX_1D)  :: self
-       TYPE(DEF_BLACKBOX_1D) :: ao_bbox
        TYPE(DEF_GREENBOX_1D) :: ao_gbox
      END SUBROUTINE rhs_weak_formulation_1D
   END INTERFACE
@@ -89,13 +84,11 @@ MODULE SPI_MATRIX_DEF
 
   ! ..................................................
   INTERFACE
-     SUBROUTINE Assembly_Diagnostics_1D(self, ao_bbox, ao_gbox, ai_nstep)
-       USE SPI_BLACKBOX_DEF
+     SUBROUTINE Assembly_Diagnostics_1D(self, ao_gbox, ai_nstep)
        USE SPI_GREENBOX_DEF
        IMPORT DEF_MATRIX_1D
 
        CLASS(DEF_MATRIX_1D)  :: self
-       TYPE(DEF_BLACKBOX_1D) :: ao_bbox
        TYPE(DEF_GREENBOX_1D) :: ao_gbox
        INTEGER :: ai_nstep
      END SUBROUTINE Assembly_Diagnostics_1D

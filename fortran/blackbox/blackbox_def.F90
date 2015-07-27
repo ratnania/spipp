@@ -10,9 +10,6 @@ MODULE SPI_BLACKBOX_DEF
      INTEGER :: oi_n_points
      INTEGER :: oi_basis_type
 
-     REAL(KIND=SPI_RK), DIMENSION(:), ALLOCATABLE  :: Vol
-     REAL(KIND=SPI_RK), DIMENSION(:), ALLOCATABLE  :: wVol
-
      ! ...
      REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: Xp_0
      ! ...    
@@ -25,6 +22,11 @@ MODULE SPI_BLACKBOX_DEF
      ! ... Position Physical Derivatives
      REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: Xp_x1 
      REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: Xp_x1x1 
+     ! ...
+
+     ! ... Volume and wieghted volume
+     REAL(KIND=SPI_RK), DIMENSION(:), ALLOCATABLE  :: Vol
+     REAL(KIND=SPI_RK), DIMENSION(:), ALLOCATABLE  :: wVol
      ! ...
 
      ! ...
