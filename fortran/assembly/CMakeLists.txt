@@ -10,6 +10,6 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_assembly.mod)
 
 add_library(spi_assembly SHARED ${files})
-target_link_libraries(spi_assembly spi_global spi_greenbox spi_matrix spi_mesh spi_space)
+target_link_libraries(spi_assembly spi_global spi_greenbox spi_matrix spi_mesh spi_space ${LAPACK_LIBRARIES})
 install(TARGETS spi_assembly DESTINATION lib)
 ##########################################################################

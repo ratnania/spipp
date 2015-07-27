@@ -13,6 +13,6 @@ set(mods
         ${CMAKE_BINARY_DIR}/modules/spi_utilities.mod)
 
 add_library(spi_sparse_matrix SHARED ${files})
-target_link_libraries(spi_sparse_matrix spi_global spi_utilities)
+target_link_libraries(spi_sparse_matrix spi_global spi_utilities ${LAPACK_LIBRARIES})
 install(TARGETS spi_sparse_matrix DESTINATION lib)
 ##########################################################################
