@@ -46,6 +46,8 @@ CONTAINS
     INTEGER                   :: li_locsize
     INTEGER                   :: li_root
     INTEGER                   :: li_i 
+    INTEGER                   :: li_A
+    INTEGER                   :: li_Aprime
     INTEGER                   :: li_var
     INTEGER                   :: nivar
     INTEGER                   :: njvar
@@ -161,7 +163,7 @@ CONTAINS
        CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, lr_a, lr_b)
        CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_test_space  % oo_bbox, lr_a, lr_b)
 
-       CALL BLACKBOX_UPDATE_PHYSICAL_BASIS(ao_trial_space % oo_bbox) 
+       CALL UPDATE_PHYSICAL_BASIS_BLACKBOX(ao_trial_space % oo_bbox) 
 
        ! ... TODO: add here coordinates system update (not sure be needed)
        ! ...
@@ -218,9 +220,12 @@ CONTAINS
                 IF (ISNAN(ao_matrix % Matrix_Contribution(1,1))) THEN
                    ao_matrix % Matrix_Contribution = 1.0E14
                 END IF
-!                
-!                CALL SPM_ASSEMBLYADDVALUES_LOCAL(ao_matrix % oi_matrix_id, li_loc_1, li_loc_2, &
-!                        & ao_matrix % Matrix_Contribution, ierr)
+
+                ! TODO 
+                li_A      = -1
+                li_Aprime = -1
+                lr_value  = ao_matrix % Matrix_Contribution(1,1)
+                CALL ADD_SPARSE_MATRIX_VALUE(ao_matrix, lr_value, li_A, li_Aprime) 
                 
                 ! ... reset Matrix contribution array
                 CALL MATRIX_RESET_ELEMENT_MATRIX(ao_matrix)

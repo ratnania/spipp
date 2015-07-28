@@ -1,5 +1,6 @@
 !# -*- coding: utf8 -*-
 MODULE SPI_MATRIX
+  USE SPI_GLOBAL_DEF
   USE SPI_MATRIX_DEF
   IMPLICIT NONE
 
@@ -139,7 +140,6 @@ CONTAINS
 !  END SUBROUTINE _MATRIX
   ! ..........................................................  
 
-
   ! ..........................................................        
   SUBROUTINE FREE_MATRIX(self)
   IMPLICIT NONE
@@ -151,4 +151,70 @@ CONTAINS
 
   END SUBROUTINE FREE_MATRIX
   ! ..........................................................  
+
+  ! .............................................
+  SUBROUTINE ASSEMBLYPUSH_MATRIX(self, ROWS, COLS, IERROR)
+  ! pushes add value from localdata to the matrix
+    !(ID, IERROR)
+    IMPLICIT NONE
+    CLASS(DEF_MATRIX_ABSTRACT) :: self
+    INTEGER, DIMENSION(:,:), POINTER, INTENT(IN)  :: ROWS
+    INTEGER, DIMENSION(:,:), POINTER, INTENT(IN)  :: COLS
+    INTEGER,                          INTENT(OUT) :: IERROR
+    ! LOCAL
+    INTEGER :: li_ierr 
+    INTEGER :: li_I
+    INTEGER :: li_J
+    INTEGER :: li_lrow
+    INTEGER :: li_lcol
+    INTEGER :: li_iloc
+    INTEGER :: li_jloc
+    INTEGER :: li_idof
+    INTEGER :: li_jdof
+    INTEGER :: li_loc
+    INTEGER :: li_dof
+    INTEGER :: li_err
+    REAL(KIND=SPI_RK)    :: lr_val
+    LOGICAL :: ll_condition
+    INTEGER :: li_ndof_rows 
+    INTEGER :: li_ndof_cols
+    INTEGER :: li_localsize_rows 
+    INTEGER :: li_localsize_cols           
+
+!    ! ... TODO
+!    li_localsize_rows = SPI_INT_DEFAULT
+!    li_localsize_cols = SPI_INT_DEFAULT 
+!    li_ndof_rows      = SPI_INT_DEFAULT 
+!    li_ndof_cols      = SPI_INT_DEFAULT 
+!
+!    DO li_lcol=1,li_localsize_cols
+!       DO li_jdof=1, li_ndof_cols
+!          li_jloc = li_jdof + (li_lcol-1) * li_ndof_cols
+!
+!          DO li_lrow=1,li_localsize_rows
+!             DO li_idof=1, li_ndof_rows
+!                li_iloc = li_idof + (li_lrow-1) * li_ndof_rows
+!
+!                li_I   = ROWS(li_iloc, li_jloc)
+!                li_J   = COLS(li_iloc, li_jloc)
+!                lr_val = self % opr_locmat(li_iloc, li_jloc)
+!
+!                CALL ADD_SPARSE_MATRIX_VALUE(self, lr_val, li_I, li_J) 
+!
+!             END DO
+!          END DO
+!       END DO
+!    END DO
+!    ! ... 
+!
+!    ! ... 
+!    ! Reset
+!    self % opr_locmat = 0.0
+!    self % oi_npush_locmat = M%oi_npush_locmat + 1
+!    ! ... 
+
+  END SUBROUTINE ASSEMBLYPUSH_MATRIX
+  ! .............................................
+
+
 END MODULE SPI_MATRIX 
