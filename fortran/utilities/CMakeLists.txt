@@ -5,7 +5,7 @@ set(files
 set(mods 
           ${CMAKE_BINARY_DIR}/modules/spi_qsort.mod)
 
-add_library(spi_utilities SHARED ${files})
+add_library(spi_utilities ${files})
 target_link_libraries(spi_utilities spi_global)
 install(TARGETS spi_utilities DESTINATION lib)
 ##########################################################################

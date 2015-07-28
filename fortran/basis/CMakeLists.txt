@@ -15,7 +15,7 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_basis_hbezier.mod
           ${CMAKE_BINARY_DIR}/modules/basis.mod)
 
-add_library(spi_basis SHARED ${files})
+add_library(spi_basis ${files})
 target_link_libraries(spi_basis spi_bspline spi_global spi_quadratures spi_mesh)
 install(TARGETS spi_basis DESTINATION lib)
 ##########################################################################

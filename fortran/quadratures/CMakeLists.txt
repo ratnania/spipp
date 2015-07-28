@@ -10,7 +10,7 @@ set(mods
           ${CMAKE_BINARY_DIR}/spi_quadratures_line.mod
           ${CMAKE_BINARY_DIR}/spi_quadratures.mod)
 #
-add_library(spi_quadratures SHARED ${files})
+add_library(spi_quadratures ${files})
 target_link_libraries(spi_quadratures spi_global)
 install(TARGETS spi_quadratures DESTINATION lib)
 ##########################################################################

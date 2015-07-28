@@ -7,7 +7,7 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_blackbox_def.mod
           ${CMAKE_BINARY_DIR}/modules/spi_blackbox.mod)
 
-add_library(spi_blackbox SHARED ${files})
+add_library(spi_blackbox ${files})
 target_link_libraries(spi_blackbox spi_global spi_quadratures spi_mesh spi_basis)
 install(TARGETS spi_blackbox DESTINATION lib)
 ##########################################################################

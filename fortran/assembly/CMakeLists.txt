@@ -9,7 +9,7 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_assembly_1d_bspline.mod
           ${CMAKE_BINARY_DIR}/modules/spi_assembly.mod)
 
-add_library(spi_assembly SHARED ${files})
+add_library(spi_assembly ${files})
 target_link_libraries(spi_assembly spi_global spi_greenbox spi_matrix spi_mesh spi_space ${LAPACK_LIBRARIES})
 install(TARGETS spi_assembly DESTINATION lib)
 ##########################################################################

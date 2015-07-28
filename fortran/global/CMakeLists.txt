@@ -6,7 +6,7 @@ set(mods
 	${CMAKE_BINARY_DIR}/spi_global_def.mod  
 	${CMAKE_BINARY_DIR}/spi_global.mod)
 #
-add_library(spi_global SHARED ${files})
+add_library(spi_global ${files})
 install(TARGETS spi_global DESTINATION lib)
 ##########################################################################
 

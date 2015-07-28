@@ -9,6 +9,6 @@ set(mods
 	${CMAKE_BINARY_DIR}/srf.mod  
 	${CMAKE_BINARY_DIR}/vol.mod)
 #
-add_library(spi_bspline SHARED ${files})
+add_library(spi_bspline ${files})
 install(TARGETS spi_bspline DESTINATION lib)
 ##########################################################################

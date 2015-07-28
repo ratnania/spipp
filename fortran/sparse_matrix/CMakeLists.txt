@@ -12,7 +12,7 @@ set(mods
 	${CMAKE_BINARY_DIR}/modules/SPI_CSR_MATRIX_MODULE.mod
         ${CMAKE_BINARY_DIR}/modules/spi_utilities.mod)
 
-add_library(spi_sparse_matrix SHARED ${files})
+add_library(spi_sparse_matrix ${files})
 target_link_libraries(spi_sparse_matrix spi_global spi_utilities ${LAPACK_LIBRARIES})
 install(TARGETS spi_sparse_matrix DESTINATION lib)
 ##########################################################################
