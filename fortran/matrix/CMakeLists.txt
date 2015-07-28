@@ -8,6 +8,6 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_matrix.mod)
 
 add_library(spi_matrix ${files})
-target_link_libraries(spi_matrix spi_global spi_sparse_matrix ${LAPACK_LIBRARIES})
+target_link_libraries(spi_matrix spi_global spi_numbering spi_space spi_sparse_matrix ${LAPACK_LIBRARIES})
 install(TARGETS spi_matrix DESTINATION lib)
 ##########################################################################

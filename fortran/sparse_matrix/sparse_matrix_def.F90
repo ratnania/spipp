@@ -6,12 +6,15 @@ IMPLICIT NONE
    TYPE, PUBLIC, ABSTRACT :: DEF_SPARSE_MATRIX_ABSTRACT
       INTEGER  :: oi_nR   !NUMBER OF ROWS
       INTEGER  :: oi_nC   !NUMBER OF COLUMNS
+      INTEGER  :: oi_nnz  !NUMBER OF NON ZERO ELTS
+      INTEGER  :: oi_n_elmts !NUMBER OF MESH ELEMENTS
    END TYPE DEF_SPARSE_MATRIX_ABSTRACT
    ! ...................................................
 
    ! ...................................................
    TYPE, PUBLIC, EXTENDS(DEF_SPARSE_MATRIX_ABSTRACT) :: DEF_MATRIX_CSR
-      INTEGER  :: oi_nel  !NUMBER OF NON ZERO ELTS
+      LOGICAL  :: ol_allocated_ia 
+      LOGICAL  :: ol_allocated_jaa 
       INTEGER, DIMENSION(:), POINTER  :: opi_ia
       INTEGER, DIMENSION(:), POINTER  :: opi_ja		
 

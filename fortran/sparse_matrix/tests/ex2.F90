@@ -27,7 +27,7 @@ implicit none
    TYPE(DEF_MESH_1D_BSPLINE), TARGET :: lo_mesh
    TYPE(DEF_NUMBERING_1D_BSPLINE), TARGET :: lo_numbering
    type(DEF_MATRIX_CSR) :: lo_A
-   integer  :: li_n, li_nel
+   integer  :: li_n, li_nnz
    real(SPI_RK),dimension(:),pointer :: lpr_x,lpr_y
    integer  :: li_err,li_flag,li_i,li_j
    character(len=14) :: ls_file		
@@ -42,13 +42,13 @@ implicit none
    CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
    CALL CREATE_NUMBERING(lo_numbering, lo_mesh) 
 
-   call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n, ai_nel=li_nel )
+   call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n )
 
    PRINT *, ">>> LM"
    PRINT *, lo_numbering % opi_LM
 
    print *, "%%%%%"
-   CALL initialize_sparse_matrix_with_LM(lo_A, lo_mesh % oi_n_elmts, &
+   CALL initialize_sparse_matrix_with_LM(lo_A, &
            & lo_numbering % opi_LM, lo_mesh % oi_nen, &
            & lo_numbering % opi_LM, lo_mesh % oi_nen)
    print *, "%%%%%"

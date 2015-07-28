@@ -9,14 +9,14 @@ IMPLICIT NONE
       integer		:: oi_size
       
       !> LOCAL TO GLOBAL INDEXATION
-      integer, dimension( : , : ), allocatable :: opi_IEN
+      integer, dimension( : , : ), pointer :: opi_IEN
       !> THE GLOBAL INDEX. WE MUST REMOVE DIRICHLET BASIS FUNCTIONS
-      integer, dimension( : ), allocatable :: opi_ID	
+      integer, dimension( : ), pointer :: opi_ID	
       !> LOCAL MATRIX, LM ( e , b ) = ID ( IEN ( e , b ) )
-      integer, dimension( : , : ), allocatable :: opi_LM
+      integer, dimension( : , : ), pointer :: opi_LM
 
       !> THE LEFT KNOT INDEX CORRESPONDING TO A NON ZERO-MEASURE ELEMENT
-      integer, dimension( : ), allocatable :: opi_ELT_INDEX		
+      integer, dimension( : ), pointer :: opi_ELT_INDEX		
       
    END TYPE DEF_NUMBERING_ABSTRACT
    ! ...................................................

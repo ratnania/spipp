@@ -17,7 +17,7 @@ USE SPI_SPARSE_MATRIX
 implicit none
    ! LOCAL
    type(DEF_MATRIX_CSR) :: lo_A
-   integer  :: li_n, li_nel
+   integer  :: li_n, li_nnz
    real(SPI_RK),dimension(:),pointer :: lpr_x,lpr_y
    integer  :: li_err,li_flag,li_i,li_j
    character(len=14) :: ls_file		
@@ -25,7 +25,7 @@ implicit none
    ls_file = "ex_1_matrix.mm"
    
    li_n = 8
-   li_nel = 18
+   li_nnz = 18
    
    allocate(lpr_x(li_n),stat=li_err)
    if (li_err.ne.0) li_flag=10	
@@ -33,7 +33,7 @@ implicit none
    allocate(lpr_y(li_n),stat=li_err)
    if (li_err.ne.0) li_flag=10		
    
-   call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n, ai_nel=li_nel )
+   call create_sparse_matrix( lo_A, ai_nR=li_n, ai_nC=li_n, ai_nnz=li_nnz )
    
    lo_A%opi_ia(1) =1
    lo_A%opi_ia(2) =5	

@@ -8,12 +8,12 @@ IMPLICIT NONE
 CONTAINS
 
    ! ...................................................
-   SUBROUTINE create_sparse_matrix ( self, ai_nR, ai_nC, ai_nel, ao_csr)
+   SUBROUTINE create_sparse_matrix ( self, ai_nR, ai_nC, ai_nnz, ao_csr)
    IMPLICIT NONE
       CLASS(DEF_SPARSE_MATRIX_ABSTRACT)          , INTENT(INOUT) :: self
       INTEGER                          , OPTIONAL, INTENT(IN)    :: ai_nR
       INTEGER                          , OPTIONAL, INTENT(IN)    :: ai_nC
-      INTEGER                          , OPTIONAL, INTENT(IN)    :: ai_nel
+      INTEGER                          , OPTIONAL, INTENT(IN)    :: ai_nnz
       CLASS(DEF_MATRIX_CSR)            , OPTIONAL, INTENT(INOUT) :: ao_csr 
       ! LOCAL
       INTEGER :: li_err
@@ -22,13 +22,7 @@ CONTAINS
       ! ...
       SELECT TYPE (self)
       CLASS IS (DEF_MATRIX_CSR)
-         IF ( (.NOT. PRESENT(ai_nR) ) .OR. &
-            & (.NOT. PRESENT(ai_nC) ) .OR. &
-            & (.NOT. PRESENT(ai_nel) ) ) THEN
-            PRINT *, "create_sparse_matrix: try to create csr matrix, missing arguments."
-            STOP
-         END IF
-         CALL create_csr_matrix( self, ai_nR, ai_nC, ai_nel ) 
+         CALL create_csr_matrix( self, ai_nR=ai_nR, ai_nC=ai_nC, ai_nnz=ai_nnz ) 
      
       CLASS IS (DEF_MATRIX_BND)
          IF (.NOT. PRESENT(ao_csr) ) THEN
@@ -201,10 +195,9 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE initialize_sparse_matrix_with_LM(self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+   SUBROUTINE initialize_sparse_matrix_with_LM(self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
    IMPLICIT NONE
       CLASS(DEF_SPARSE_MATRIX_ABSTRACT), INTENT(INOUT) :: self
-      INTEGER :: ai_nel
       !> param[in] api_LM_1 : LM ARRAY FOR ROWS
       integer, dimension(:,:) :: api_LM_1
       !> param[in] api_LM_1 : LM ARRAY FOR COLUMNS
@@ -220,7 +213,7 @@ CONTAINS
       ! ...
       SELECT TYPE (self)
       CLASS IS (DEF_MATRIX_CSR)
-         CALL initialize_csr_matrix_with_LM (self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+         CALL initialize_csr_matrix_with_LM (self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
      
       CLASS IS (DEF_MATRIX_BND)
          STOP "initialize_sparse_matrix_with_LM: not yet implemented"

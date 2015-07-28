@@ -7,35 +7,53 @@ IMPLICIT NONE
 CONTAINS
 
    ! ...................................................
-   SUBROUTINE create_csr_matrix( self, ai_nR, ai_nC, ai_nel )
+   SUBROUTINE create_csr_matrix( self, ai_nR, ai_nC, ai_nnz )
    IMPLICIT NONE
       !> param[inout] self : CSR MATRIX STRUCTURE
       type(DEF_MATRIX_CSR) :: self		
       !> param[in] ai_nC : NUMBER OF COLUMNS
-      INTEGER :: ai_nC
+      INTEGER, OPTIONAL :: ai_nC
       !> param[in] ai_nR : NUMBER OF ROWS
-      INTEGER :: ai_nR
-      !> param[in] ai_nel : NUMBER OF NON ZERO ELEMENTS		
-      INTEGER :: ai_nel				
+      INTEGER, OPTIONAL :: ai_nR
+      !> param[in] ai_nnz : NUMBER OF NON ZERO ELEMENTS		
+      INTEGER, OPTIONAL :: ai_nnz				
       !local var
       INTEGER :: li_err,li_flag
       
-      self%ol_use_mm_format = .FALSE.
-      
-      self%oi_nR   = ai_nR
-      self%oi_nC   = ai_nC		
-      self%oi_nel  = ai_nel
-      
-      ALLOCATE(self%opi_ia(self%oi_nR+1),stat=li_err)
-      IF (li_err.ne.0) li_flag=10	
-      
-      ALLOCATE(self%opi_ja(self%oi_nel),stat=li_err)
-      IF (li_err.ne.0) li_flag=20	
-   		
-      ALLOCATE(self%opr_a(self%oi_nel),stat=li_err)
-      IF (li_err.ne.0) li_flag=30			
+      self % ol_use_mm_format = .FALSE.
+      self % ol_allocated_ia  = .FALSE. 
+      self % ol_allocated_jaa = .FALSE. 
 
-      self%opr_a ( : ) = 0.0
+      self % oi_nR      = SPI_INT_DEFAULT
+      self % oi_nC      = SPI_INT_DEFAULT
+      self % oi_nnz     = SPI_INT_DEFAULT
+      self % oi_n_elmts = SPI_INT_DEFAULT
+      
+      IF (PRESENT(ai_nR)) THEN
+         self%oi_nR   = ai_nR
+
+         ALLOCATE(self%opi_ia(self%oi_nR+1),stat=li_err)
+         IF (li_err.ne.0) li_flag=10	
+
+         self % ol_allocated_ia = .TRUE. 
+      END IF
+
+      IF (PRESENT(ai_nC)) THEN
+         self%oi_nC   = ai_nC		
+      END IF
+
+      IF (PRESENT(ai_nnz)) THEN
+         self%oi_nnz  = ai_nnz
+      
+         ALLOCATE(self%opi_ja(self%oi_nnz),stat=li_err)
+         IF (li_err.ne.0) li_flag=20	
+           	
+         ALLOCATE(self%opr_a(self%oi_nnz),stat=li_err)
+         IF (li_err.ne.0) li_flag=30			
+        
+         self % ol_allocated_jaa = .TRUE. 
+         self%opr_a ( : ) = 0.0
+      END IF
    END SUBROUTINE create_csr_matrix
    ! ...................................................
 
@@ -64,17 +82,17 @@ CONTAINS
       
       self%ol_use_mm_format = .FALSE.		
       
-      self%oi_nel = 2 * ao_A%oi_nel - li_count
+      self%oi_nnz = 2 * ao_A%oi_nnz - li_count
       self%oi_nR = ao_A%oi_nR
       self%oi_nC = ao_A%oi_nC	
       
       ALLOCATE(self%opi_ia(self%oi_nR+1),stat=li_err)
       if (li_err.ne.0) li_flag=10	
       
-      ALLOCATE(self%opi_ja(self%oi_nel),stat=li_err)
+      ALLOCATE(self%opi_ja(self%oi_nnz),stat=li_err)
       if (li_err.ne.0) li_flag=20	
                       
-      ALLOCATE(self%opr_a(self%oi_nel),stat=li_err)
+      ALLOCATE(self%opr_a(self%oi_nnz),stat=li_err)
       if (li_err.ne.0) li_flag=30	
       		
       ! COPY THE OLD MATRIX IN THE NEW MATRIX		
@@ -126,9 +144,13 @@ CONTAINS
    implicit none
       type(DEF_MATRIX_CSR) :: self
       
-      deallocate(self%opi_ia)
-      deallocate(self%opi_ja)
-      deallocate(self%opr_a)
+      IF (self % ol_allocated_ia) THEN 
+         deallocate(self%opi_ia)
+      END IF
+      IF (self % ol_allocated_jaa) THEN 
+         deallocate(self%opi_ja)
+         deallocate(self%opr_a)
+      END IF
       
       if ( self%ol_use_mm_format ) then
          DEALLOCATE ( self%opi_i )
@@ -148,7 +170,7 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   integer function count_non_zero_elts ( ai_nR, ai_nel, &
+   integer function count_non_zero_elts ( ai_nR, ai_n_elmts, &
                                         & api_LM_1, ai_nen_1, &
                                         & api_LM_2, ai_nen_2, &
                                         & api_columns, api_occ )
@@ -157,7 +179,7 @@ CONTAINS
    implicit none
       integer :: ai_nR
       integer, dimension(:,:) :: api_LM_1, api_LM_2			
-      integer :: ai_nel, ai_nen_1, ai_nen_2
+      integer :: ai_n_elmts, ai_nen_1, ai_nen_2
       integer, dimension(:,:), pointer :: api_columns	
       integer, dimension(:), pointer :: api_occ	
       !local var
@@ -168,7 +190,7 @@ CONTAINS
       logical :: ll_done
       
       ! WE FIRST COMPUTE, FOR EACH ROW, THE NUMBER OF COLUMNS THAT WILL BE USED	
-      do li_e = 1, ai_nel
+      do li_e = 1, ai_n_elmts
          do li_b_1 = 1, ai_nen_1
             li_A_1 = api_LM_1 ( li_b_1, li_e )
             if ( li_A_1 == 0 ) then
@@ -214,11 +236,10 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   subroutine initialize_csr_matrix_with_LM ( self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2 )
+   subroutine initialize_csr_matrix_with_LM ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2)
    implicit none
       !> param[inout] self : CSR MATRIX STRUCTURE		
       type(DEF_MATRIX_CSR) :: self
-      INTEGER :: ai_nel
       !> param[in] api_LM_1 : LM ARRAY FOR ROWS
       integer, dimension(:,:) :: api_LM_1
       !> param[in] api_LM_1 : LM ARRAY FOR COLUMNS
@@ -229,13 +250,23 @@ CONTAINS
       integer :: ai_nen_2					
       !local var
       integer :: li_err,li_flag
-      integer :: li_nnz
       integer, dimension(:,:), pointer :: lpi_columns	
       integer, dimension(:), pointer :: lpi_occ			
       
+      ! TODO modify if MPI is used
       self % oi_nR =  MAXVAL(api_LM_1)
       self % oi_nC =  MAXVAL(api_LM_2)
-      self % oi_nel = ai_nel
+      IF (SIZE(api_LM_1,1) .NE. SIZE(api_LM_2, 1)) THEN
+         STOP "initialize_csr_matrix_with_LM: LM_1 and LM_2 must have the same number of elements"
+      END IF
+      self % oi_n_elmts =  SIZE(api_LM_1, 1)
+
+      IF (.NOT. self % ol_allocated_ia) THEN
+         ALLOCATE(self%opi_ia(self%oi_nR+1),stat=li_err)
+         IF (li_err.ne.0) li_flag=10	
+
+         self % ol_allocated_ia = .TRUE. 
+      END IF
 
       allocate(lpi_columns(self%oi_nR, 0:8*ai_nen_2),stat=li_err)
       if (li_err.ne.0) li_flag=1	
@@ -247,26 +278,37 @@ CONTAINS
       lpi_occ ( : ) = 0
       
       ! COUNTING NON ZERO ELEMENTS
-      li_nnz = count_non_zero_elts ( self % oi_nR, ai_nel, &
-              & api_LM_1, ai_nen_1, &
-              & api_LM_2, ai_nen_2, &
-              & lpi_columns, lpi_occ )
-      print *, "nnz ", li_nnz
+      self % oi_nnz = count_non_zero_elts ( self % oi_nR, self % oi_n_elmts, &
+                                          & api_LM_1, ai_nen_1, &
+                                          & api_LM_2, ai_nen_2, &
+                                          & lpi_columns, lpi_occ )
+!      print *, "nnz ", self % oi_nnz
       
-      call init_SparseMatrix ( self, self%oi_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )					
-      deallocate(lpi_columns)		
+      IF (.NOT. self % ol_allocated_jaa) THEN
+         ALLOCATE(self%opi_ja(self%oi_nnz),stat=li_err)
+         IF (li_err.ne.0) li_flag=20	
+           	
+         ALLOCATE(self%opr_a(self%oi_nnz),stat=li_err)
+         IF (li_err.ne.0) li_flag=30			
+        
+         self % ol_allocated_jaa = .TRUE. 
+         self%opr_a ( : ) = 0.0
+      END IF
+
+      call init_SparseMatrix ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, lpi_columns, lpi_occ )					
       deallocate(lpi_occ)		
+      deallocate(lpi_columns)		
    end subroutine initialize_csr_matrix_with_LM
    ! ...................................................
      
    ! ...................................................
-   subroutine init_SparseMatrix ( self, ai_nel, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, api_columns, api_occ )
+   subroutine init_SparseMatrix ( self, api_LM_1, ai_nen_1, api_LM_2, ai_nen_2, api_columns, api_occ )
    ! _1 FOR ROWS
    ! _2 FOR COLUMNS	
    implicit none
       type(DEF_MATRIX_CSR) :: self
       integer, dimension(:,:) :: api_LM_1, api_LM_2			
-      integer :: ai_nel, ai_nen_1, ai_nen_2
+      integer :: ai_nen_1, ai_nen_2
       integer, dimension(:,:), pointer :: api_columns	
       integer, dimension(:), pointer :: api_occ	
       !local var
@@ -282,9 +324,11 @@ CONTAINS
       end do
       
       ! INITIALIZING ja		
-      do li_e = 1, ai_nel
+      do li_e = 1, self % oi_n_elmts
+      print *, ">>>> elment", li_e
          do li_b_1 = 1, ai_nen_1
             li_A_1 = api_LM_1 ( li_b_1, li_e )
+            print *, li_b_1, li_A_1
       
             if ( li_A_1 == 0 ) then
                cycle
@@ -312,7 +356,7 @@ CONTAINS
 
          end do
       end do	
-      
+ 
    end subroutine init_SparseMatrix	
    ! ...................................................
 
@@ -383,7 +427,7 @@ CONTAINS
       if (li_ios/=0) STOP "print_nnz_csrMatrix : erreur d'ouverture du fichier "
               
       write(li_file, *)'%%MatrixMarket matrix coordinate real general'
-      write(li_file, *)self%oi_nR,',',self%oi_nC,',',self%oi_nel
+      write(li_file, *)self%oi_nR,',',self%oi_nC,',',self%oi_nnz
 
       do li_i =1,self%oi_nR 
          do li_k = self%opi_ia(li_i),self%opi_ia(li_i+1)-1

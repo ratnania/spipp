@@ -152,12 +152,22 @@ CONTAINS
       REAL(SPI_RK) :: lr_a
       REAL(SPI_RK) :: lr_b
       REAL(SPI_RK) :: lr_value
+      character(len=14) :: ls_file		
+
+      ls_file = "matrix_ex_2.mm"
    
       CALL CREATE_MESH(lo_mesh, ai_n=N, ai_p=P, ai_type_bc=SPI_BC_PERIODIC) 
       CALL CREATE_SPACE(lo_space, lo_mesh, SPI_QUADRATURES_LEGENDRE, ai_k=K) 
 
       CALL CREATE_GREENBOX(lo_gbox, N_VAR, lo_space % oo_quad)
-      CALL CREATE_MATRIX(lo_matrix)
+      CALL CREATE_MATRIX(lo_matrix, lo_space, lo_space)
+
+      lo_matrix % oo_csr % opr_a = 1.0
+
+      ! ... save the matrix in the MM format
+      CALL save_sparse_matrix(lo_matrix % oo_csr, ls_file, SPI_MATRIX_OUTPUT_FORMAT_MM)  
+      ! ...
+
 
 !      CALL initialize_sparse_matrix_with_LM(lo_matrix % oo_csr, lo_mesh % oi_n_elmts, &
 !              & lo_space % oo_numbering % opi_LM, lo_mesh % oi_nen, &
