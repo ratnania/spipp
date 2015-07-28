@@ -23,18 +23,29 @@ MODULE SPI_MATRIX_DEF
      INTEGER :: oi_nvar
      LOGICAL :: ol_to_assembly
 
+     INTEGER :: oi_ndof_rows 
+     INTEGER :: oi_ndof_cols
+     INTEGER :: oi_localsize_rows 
+     INTEGER :: oi_localsize_cols
+
+     ! ... Local Matrix Data 
+     LOGICAL :: ol_allocated_locmat
+     INTEGER :: oi_npush_locmat
+     REAL(KIND=SPI_RK), DIMENSION(:, :), POINTER :: opr_locmat
+     ! ...
+
      REAL(KIND=SPI_RK), DIMENSION(:)  , ALLOCATABLE  :: opr_global_rhs 
      REAL(KIND=SPI_RK), DIMENSION(:)  , ALLOCATABLE  :: opr_global_unknown
 
      REAL(KIND=SPI_RK), DIMENSION(:,:), POINTER :: Matrix_Contribution 
      REAL(KIND=SPI_RK), DIMENSION(:)  , POINTER :: Rhs_Contribution
+
+     TYPE(DEF_MATRIX_CSR) :: oo_csr
   END TYPE DEF_MATRIX_ABSTRACT
   ! ..................................................
 
   ! ..................................................
   TYPE, PUBLIC, EXTENDS(DEF_MATRIX_ABSTRACT) :: DEF_MATRIX_1D
-     TYPE(DEF_MATRIX_CSR) :: oo_csr
-
      PROCEDURE(matrix_weak_formulation_1D), POINTER :: ptr_matrix_contribution  => NULL ()
      PROCEDURE(rhs_weak_formulation_1D)   , POINTER :: ptr_rhs_contribution     => NULL ()
      PROCEDURE(Assembly_Diagnostics_1D)   , POINTER :: ptr_assembly_diagnostics => NULL ()
