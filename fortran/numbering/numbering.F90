@@ -331,6 +331,57 @@ MODULE spi_numbering
       
    END SUBROUTINE INIT_LM_BSPLINE 
    ! ........................................................
+
+   ! .............................................
+   SUBROUTINE GET_LTOG_1D_BSPLINE(self, ai_elmt_id, &
+                   & api_ltog_rows, api_ltog_cols, api_ltog_rhsrows, &
+                   & ai_n_rvars, ai_n_cvars)
+   ! using splines: we have only 1 vertex and nen basis functions that are non-vanishing within the element
+     IMPLICIT NONE
+     TYPE(DEF_NUMBERING_1D_BSPLINE), INTENT(INOUT) :: self
+     INTEGER                             :: ai_elmt_id
+     INTEGER, DIMENSION(:,:), POINTER, INTENT(IN)  :: api_ltog_rows
+     INTEGER, DIMENSION(:,:), POINTER, INTENT(IN)  :: api_ltog_cols
+     INTEGER, DIMENSION(:)  , POINTER, INTENT(IN)  :: api_ltog_rhsrows
+     INTEGER, INTENT(IN) 		:: ai_n_rvars 
+     INTEGER, INTENT(IN) 	        :: ai_n_cvars 
+     ! LOCAL
+     INTEGER                             :: i_loc1
+     INTEGER                             :: i_loc2
+     INTEGER                             :: i_glob1
+     INTEGER                             :: i_glob2
+     INTEGER                             :: i_pos1
+     INTEGER                             :: i_pos2
+     INTEGER                             :: ivar
+     INTEGER                             :: jvar
+     INTEGER                             :: nivar
+     INTEGER                             :: njvar
+
+     nivar = ai_n_rvars
+     njvar = ai_n_cvars
+
+     DO i_loc1= 1, self % ptr_mesh % oi_nen
+        DO ivar = 1, nivar
+           i_pos1 = self % opi_LM(ai_elmt_id, i_loc1)
+           i_glob1 = SPI_IDDL_1D(ivar, i_pos1, nivar)
+           api_ltog_rhsrows(ivar+(i_loc1-1)*nivar) = i_glob1
+
+           DO i_loc2= 1, self % ptr_mesh % oi_nen
+              DO jvar = 1, njvar
+                 i_pos2 = self % opi_LM(ai_elmt_id, i_loc2)
+                 i_glob2 = SPI_IDDL_1D(jvar, i_pos2, njvar)
+
+                 api_ltog_rows(ivar+(i_loc1-1)*nivar, jvar+(i_loc2-1)*nivar) = i_glob1
+                 api_ltog_cols(ivar+(i_loc1-1)*njvar, jvar+(i_loc2-1)*njvar) = i_glob2
+!                 print *, i_glob1, i_glob2
+              END DO
+           END DO
+        END DO
+     END DO
+
+   END SUBROUTINE GET_LTOG_1D_BSPLINE
+  ! .............................................
+
    
    ! ........................................................
   

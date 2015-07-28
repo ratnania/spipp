@@ -39,5 +39,18 @@ IMPLICIT NONE
    END TYPE DEF_NUMBERING_1D_HBEZIER
    ! .........................................................
 
+CONTAINS
+
+  ! .............................................
+  INTEGER FUNCTION SPI_IDDL_1D(ai_ivar, ai_dof, ai_nvar)
+    INTEGER :: ai_dof
+    INTEGER :: ai_ivar
+    INTEGER :: ai_nvar  
+    ! LOCAL
+
+    SPI_IDDL_1D = ai_ivar + ai_nvar*(ai_dof-1) 
+  END FUNCTION SPI_IDDL_1D
+  ! .............................................
+
 
 END MODULE SPI_NUMBERING_DEF

@@ -6,24 +6,6 @@ MODULE SPI_MATRIX
   USE SPI_SPARSE_MATRIX
   IMPLICIT NONE
 
-  INTEGER, PARAMETER, PRIVATE :: mi_dtllevel_base = 2 
-
-  ! .............................................
-  
-  ! .............................................
-  PRIVATE
-  PUBLIC :: CREATE_MATRIX               &
-       ,    GET_NR_MATRIX               &
-       ,    GET_NC_MATRIX               &
-       ,    RESET_MATRIX_MATRIX         &
-       ,    RESET_MATRIX_RHS            &
-       ,    RESET_ELEMENT_MATRIX        &
-       ,    RESET_ELEMENT_RHS_MATRIX    &
-       ,    ASSEMBLYBEGIN_MATRIX        &
-       ,    ASSEMBLYEND_MATRIX          &
-       ,    GLOBAL_TO_INDEX_MATRIX      &
-       ,    FREE_MATRIX
-  
 CONTAINS
   ! ..................................................
 

@@ -163,7 +163,7 @@ CONTAINS
        CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_trial_space % oo_bbox, lr_a, lr_b)
        CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(ao_test_space  % oo_bbox, lr_a, lr_b)
 
-       CALL UPDATE_PHYSICAL_BASIS_BLACKBOX(ao_trial_space % oo_bbox) 
+       CALL BLACKBOX_UPDATE_PHYSICAL_BASIS(ao_trial_space % oo_bbox) 
 
        ! ... TODO: add here coordinates system update (not sure be needed)
        ! ...
@@ -225,7 +225,7 @@ CONTAINS
                 li_A      = -1
                 li_Aprime = -1
                 lr_value  = ao_matrix % Matrix_Contribution(1,1)
-                CALL ADD_SPARSE_MATRIX_VALUE(ao_matrix, lr_value, li_A, li_Aprime) 
+                CALL ADD_SPARSE_MATRIX_VALUE(ao_matrix % oo_csr, lr_value, li_A, li_Aprime) 
                 
                 ! ... reset Matrix contribution array
                 CALL MATRIX_RESET_ELEMENT_MATRIX(ao_matrix)
@@ -240,13 +240,13 @@ CONTAINS
        nivar = ao_matrix % oi_nvar 
        njvar = nivar 
 
-!       CALL GET_LTOG(ao_mesh, ie_Pol, &
-!               & mpi_ltog_rows, mpi_ltog_cols, mpi_ltog_rhsrows &
-!               , nivar, njvar)
-!
-!       IF ( to_assemble_matrix ) THEN
-!          CALL SPM_ASSEMBLYPUSH(ao_matrix % oi_matrix_id, mpi_ltog_rows, mpi_ltog_cols, ierr)
-!       END IF
+       CALL GET_LTOG(ao_mesh, li_elmt_id, &
+               & mpi_ltog_rows, mpi_ltog_cols, mpi_ltog_rhsrows &
+               , nivar, njvar)
+
+       IF ( to_assemble_matrix ) THEN
+          CALL ASSEMBLYPUSH_MATRIX(ao_matrix, mpi_ltog_rows, mpi_ltog_cols, ierr)
+       END IF
 !       IF ( to_assemble_rhs ) THEN
 !          CALL SPM_ASSEMBLYRHSPUSH(ao_matrix % oi_matrix_id, mpi_ltog_rhsrows, ierr)
 !       END IF
