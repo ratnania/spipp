@@ -18,6 +18,7 @@ function FindSpan(n,p,uu,U) result (span)
   real   (kind=8), intent(in) :: uu, U(0:n+p+1)
   integer(kind=4)             :: span
   integer(kind=4) low, high
+
   if (uu >= U(n+1)) then
      span = n
      return
@@ -50,6 +51,7 @@ function FindMult(i,uu,p,U) result (mult)
   real   (kind=8), intent(in)  :: uu, U(0:i+p+1)
   integer(kind=4)              :: mult
   integer(kind=4) :: j
+  
   mult = 0
   do j = -p, p+1
      if (uu == U(i+j)) mult = mult + 1
