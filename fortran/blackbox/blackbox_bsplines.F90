@@ -101,26 +101,6 @@ MODULE SPI_BLACKBOX_BSPLINE
   END SUBROUTINE COMPUTE_METRIC_BLACKBOX_1D_BSPLINE
   ! .........................................................
 
-  ! ........................................................
-  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE(self)
-  implicit none
-     type(DEF_BLACKBOX_1D_BSPLINE), INTENT(INOUT) :: self
-     ! LOCAL VARIABLES
-     INTEGER :: kg
-     INTEGER :: li_err
-     INTEGER :: i_element
-     INTEGER :: i
-     INTEGER, PARAMETER :: N_DIM = 1 
-     REAL(SPI_RK) :: lr_a
-     REAL(SPI_RK) :: lr_b
-
-     DO i =1, N_DIM
-       self % Xp_0(i_element,:, i) = lr_a + self % ptr_quad % opr_points(:) * (lr_b - lr_a )
-     END DO
-
-  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE
-  ! ........................................................
-
   ! ........................................................        
   SUBROUTINE UPDATE_POSITION_BLACKBOX_1D_BSPLINE(self)
   IMPLICIT NONE

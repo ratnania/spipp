@@ -196,28 +196,6 @@ MODULE SPI_BLACKBOX
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX(self)
-  IMPLICIT NONE
-     CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
-     ! LOCAL
-
-     ! ...
-     SELECT TYPE (self)
-     CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
-        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_BSPLINE(self)
-!     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
-!        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_HBEZIER(self)
-!     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
-!        CALL UPDATE_LOGICAL_POSITION_BLACKBOX_1D_FOURIER(self)
-     CLASS DEFAULT
-        STOP 'UPDATE_LOGICAL_POSITION_BLACKBOX: unexpected type for self object!'
-     END SELECT
-     ! ...
-
-  END SUBROUTINE UPDATE_LOGICAL_POSITION_BLACKBOX 
-  ! .........................................................
-
-  ! .........................................................
   SUBROUTINE UPDATE_POSITION_BLACKBOX(self)
   IMPLICIT NONE
      CLASS(DEF_BLACKBOX_ABSTRACT)    , INTENT(INOUT) :: self
