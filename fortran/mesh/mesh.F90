@@ -8,40 +8,40 @@ MODULE SPI_MESH
 CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH(self, ai_n, ai_p, ai_type_bc, dirname)
+  SUBROUTINE CREATE_MESH(self, ao_quad, ai_n, ai_p, ai_type_bc, apr_knots, apr_control_points)
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD
   IMPLICIT NONE
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: self 
-     INTEGER               , OPTIONAL, INTENT(IN)   :: ai_n
-     INTEGER               , OPTIONAL, INTENT(IN)   :: ai_p
+     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET , INTENT(INOUT) :: ao_quad 
+     INTEGER               , INTENT(IN)   :: ai_n
+     INTEGER               , INTENT(IN)   :: ai_p
      INTEGER               , OPTIONAL, INTENT(IN)   :: ai_type_bc
-     CHARACTER(LEN = 1024) , OPTIONAL, INTENT(IN)   :: dirname
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_control_points
      ! LOCAL
-     CHARACTER(LEN = 1024) :: ls_dirname
      INTEGER :: li_err     
-
-     IF (PRESENT(dirname)) THEN
-        ls_dirname = TRIM(dirname)
-     ELSE
-        CALL GETCWD(ls_dirname) 
-     END IF
 
      self % oi_n_vtex_per_elmt = 2  
 
      SELECT TYPE (self)
      CLASS IS (DEF_MESH_1D_BSPLINE)
         CALL CREATE_MESH_BSPLINES_1D(self, &
-                & ai_n=ai_n, &
-                & ai_p=ai_p, & 
+                & ai_n, &
+                & ai_p, & 
                 & ai_type_bc=ai_type_bc, &
-                & dirname=dirname)
+                & apr_knots=apr_knots, &
+                & apr_control_points=apr_control_points &
+                & )
+        CALL CREATE_MESH_POINTS_1D(self, ao_quad) 
 
-     CLASS IS (DEF_MESH_1D_FOURIER)
-        CALL CREATE_MESH_FOURIER_1D(self, ls_dirname)
-
-     CLASS IS (DEF_MESH_1D_HBEZIER)
-        CALL CREATE_MESH_HBEZIER_1D(self, ls_dirname)
+!     CLASS IS (DEF_MESH_1D_FOURIER)
+!        CALL CREATE_MESH_FOURIER_1D(self)
+!        CALL CREATE_MESH_POINTS_1D(self) 
+!
+!     CLASS IS (DEF_MESH_1D_HBEZIER)
+!        CALL CREATE_MESH_HBEZIER_1D(self)
+!        CALL CREATE_MESH_POINTS_1D(self) 
 
      CLASS DEFAULT
         STOP 'CREATE_MESH: unexpected type for self object!'
@@ -51,69 +51,216 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc, dirname)
+  SUBROUTINE CREATE_MESH_POINTS_1D(self, ao_quad)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     INTEGER              , OPTIONAL, INTENT(IN)    :: ai_n
-     INTEGER              , OPTIONAL, INTENT(IN)    :: ai_p
+     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET , INTENT(INOUT) :: ao_quad 
+     ! LOCAL
+     INTEGER :: i_element
+     INTEGER :: li_ig 
+     REAL(SPI_RK) :: lr_a
+     REAL(SPI_RK) :: lr_b
+     REAL(SPI_RK) :: lr_x
+
+     self % ptr_quad => ao_quad
+
+     ALLOCATE(self % opr_points(self % n_elements, self % ptr_quad % oi_n_points))
+
+     DO i_element=1, self % n_elements 
+        lr_a = self % opr_grid(i_element)
+        lr_b = self % opr_grid(i_element+1)
+
+        DO li_ig = 1, self % ptr_quad % oi_n_points
+           lr_x = lr_a + self % ptr_quad % opr_points(li_ig) * (lr_b - lr_a )
+           self % opr_points(i_element, li_ig) = lr_x
+        END DO
+     END DO
+
+  END SUBROUTINE CREATE_MESH_POINTS_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_GRID_BSPLINES_1D(self)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: n_elements
+     INTEGER :: i
+     INTEGER :: i_current
+     REAL(SPI_RK), DIMENSION(self % oi_n + self % oi_p + 1) :: lpr_grid
+     REAL(SPI_RK) :: min_current
+
+     lpr_grid = SPI_INT_DEFAULT * 1.0 
+
+     i_current = 1
+     lpr_grid(i_current) = MINVAL(self % opr_knots)
+     DO i=1, self % oi_n + self % oi_p
+        min_current = MINVAL(self % opr_knots(i : self % oi_n + self % oi_p + 1))
+        IF ( min_current > lpr_grid(i_current) ) THEN
+                i_current = i_current + 1
+                lpr_grid(i_current) = min_current
+        END IF
+     END DO
+     n_elements = i_current - 1 
+     self % n_elements = n_elements
+
+     ALLOCATE ( self % opr_grid( n_elements + 1 ) ) 
+     self % opr_grid (1:n_elements+1) = lpr_grid(1:n_elements+1)
+
+  END SUBROUTINE CREATE_MESH_GRID_BSPLINES_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D(self, apr_control_points)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+      real(SPI_RK), dimension (:), INTENT(IN):: apr_control_points
+     ! LOCAL
+
+     ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
+
+     ! ... control points
+     self % opr_control_points = apr_control_points 
+  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D(self)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: li_i
+
+     ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
+
+     ! ... control points
+     self % opr_control_points = 0.0
+     do li_i = 1, self % oi_n 
+        self % opr_control_points( li_i ) = (li_i - 1) * 1.0 / (self % oi_n - 1)
+     end do 
+     ! ...
+  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     INTEGER, INTENT(IN)    :: ai_n
+     INTEGER, INTENT(IN)    :: ai_p
+      real(SPI_RK), dimension (:), INTENT(IN):: apr_knots
+     ! LOCAL
+
+     self % oi_n = ai_n
+     self % oi_p = ai_p
+
+     ALLOCATE ( self % opr_knots( ai_n + ai_p + 1 ) ) 
+     self % opr_knots = apr_knots
+
+  END SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     INTEGER, INTENT(IN)    :: ai_n
+     INTEGER, INTENT(IN)    :: ai_p
+     INTEGER, INTENT(IN)    :: ai_type_bc
+     ! LOCAL
+     INTEGER :: li_err 
+     integer  :: li_i
+     integer  :: li_nu ! number of continuity condition for periodic vector knot		
+     real(SPI_RK), dimension ( ai_n + ai_p + 1 ) :: lpr_knot
+
+     self % oi_type_bc = ai_type_bc
+     self % oi_p       = ai_p
+     self % oi_n       = ai_n
+     
+     if ( ai_type_bc == SPI_BC_PERIODIC ) then
+        self % oi_n =  self % oi_n + self % oi_p - 1
+     end if
+                                     
+     self % n_elements = self % oi_n - ai_p
+     self % oi_nen     = ai_p + 1
+     
+     ALLOCATE ( self % opr_knots ( self % oi_n + ai_p + 1 ) ) 
+     
+     ! INITIALIZING VECTOR KNOTS
+     if ( self % oi_n < self % oi_p + 1 ) then
+        STOP "Error INIT_MESH_1D_BSPLINE: you must have N >= p + 1"
+     end if
+     
+     ! ... knots
+     self % opr_knots ( 1 : self % oi_p + 1 ) = 0.0
+     do li_i = 1, self % oi_n - self % oi_p - 1
+        self % opr_knots ( self % oi_p + 1 + li_i ) = li_i * 1.0 / ( self % oi_n - self % oi_p )
+     end do 
+     self % opr_knots ( self % oi_n + 1 : self % oi_n + self % oi_p + 1 ) = 1.0
+                                     
+     if ( ai_type_bc == SPI_BC_PERIODIC ) then
+        li_nu = self % oi_p
+        
+        lpr_knot ( : ) = self % opr_knots ( : )
+        call convert_to_periodic_knots ( lpr_Knot ( : ), self % oi_n, self % oi_p, li_nu, self % opr_knots ( : ) )
+     end if
+     ! ...
+
+  END SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc, apr_knots, apr_control_points)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     INTEGER              , INTENT(IN)    :: ai_n
+     INTEGER              , INTENT(IN)    :: ai_p
      INTEGER              , OPTIONAL, INTENT(IN)    :: ai_type_bc
-     CHARACTER(LEN = 1024), OPTIONAL, INTENT(IN)    :: dirname
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_control_points
      ! LOCAL
      INTEGER :: li_err 
 
-     IF (PRESENT(dirname)) THEN
-        ! ... TODO
-        STOP "not yet implemented"
-
-     ELSEIF ( (PRESENT(ai_n)) .AND. &
-            & (PRESENT(ai_p)) .AND. &
-            & (PRESENT(ai_type_bc))) THEN
-
-        self % oi_type_bc = ai_type_bc
-        self % oi_p       = ai_p
-        self % oi_n       = ai_n
-       
-        if ( ai_type_bc == SPI_BC_PERIODIC ) then
-           self % oi_n =  self % oi_n + self % oi_p - 1			
-        end if
-                                        
-        self % oi_n_elmts = self % oi_n - ai_p
-        self % oi_nnp     = self % oi_n
-        self % oi_nen     = ai_p + 1
-        
-        ALLOCATE ( self % opr_knot ( self % oi_n + ai_p + 1 ) ) 
-        ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
-        
-        ! INITIALIZING VECTOR KNOTS
-        call INIT_MESH_1D_BSPLINE( self, ai_type_bc )		
-     ELSE
-        STOP "Wrong arguments"
+     IF ( (.NOT. PRESENT(apr_knots)) &
+            & .AND. (PRESENT(ai_type_bc)) &
+            & ) THEN
+        CALL INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc) 
      END IF
+
+     IF ( ( PRESENT(apr_knots)) ) THEN
+        CALL INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots) 
+     END IF
+
+     IF ( ( PRESENT(apr_control_points)) ) THEN
+        CALL INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D(self, apr_control_points) 
+     ELSE
+        CALL INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D(self) 
+     END IF
+
+     CALL CREATE_MESH_GRID_BSPLINES_1D(self) 
 
   END SUBROUTINE CREATE_MESH_BSPLINES_1D
   ! .........................................................
 
-  ! .........................................................
-  SUBROUTINE CREATE_MESH_FOURIER_1D(self, dirname)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_FOURIER), INTENT(INOUT)  :: self
-     CHARACTER(LEN = 1024), INTENT(IN) :: dirname
-     ! LOCAL
-     INTEGER :: li_err 
-
-  END SUBROUTINE CREATE_MESH_FOURIER_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE CREATE_MESH_HBEZIER_1D(self, dirname)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_HBEZIER), INTENT(INOUT)  :: self
-     CHARACTER(LEN = 1024), INTENT(IN) :: dirname
-     ! LOCAL
-     INTEGER :: li_err 
-
-  END SUBROUTINE CREATE_MESH_HBEZIER_1D
-  ! .........................................................
+!  ! .........................................................
+!  SUBROUTINE CREATE_MESH_FOURIER_1D(self)
+!  IMPLICIT NONE
+!     TYPE(DEF_MESH_1D_FOURIER), INTENT(INOUT)  :: self
+!     ! LOCAL
+!     INTEGER :: li_err 
+!
+!  END SUBROUTINE CREATE_MESH_FOURIER_1D
+!  ! .........................................................
+!
+!  ! .........................................................
+!  SUBROUTINE CREATE_MESH_HBEZIER_1D(self)
+!  IMPLICIT NONE
+!     TYPE(DEF_MESH_1D_HBEZIER), INTENT(INOUT)  :: self
+!     ! LOCAL
+!     INTEGER :: li_err 
+!
+!  END SUBROUTINE CREATE_MESH_HBEZIER_1D
+!  ! .........................................................
   
   ! .........................................................
   SUBROUTINE FREE_MESH(self)
@@ -123,15 +270,17 @@ CONTAINS
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: self 
      ! LOCAL
 
+     DEALLOCATE ( self % opr_grid) 
+
      SELECT TYPE (self)
      CLASS IS (DEF_MESH_1D_BSPLINE)
         CALL FREE_MESH_BSPLINES_1D(self)
 
-     CLASS IS (DEF_MESH_1D_FOURIER)
-        CALL FREE_MESH_FOURIER_1D(self)
-
-     CLASS IS (DEF_MESH_1D_HBEZIER)
-        CALL FREE_MESH_HBEZIER_1D(self)
+!     CLASS IS (DEF_MESH_1D_FOURIER)
+!        CALL FREE_MESH_FOURIER_1D(self)
+!
+!     CLASS IS (DEF_MESH_1D_HBEZIER)
+!        CALL FREE_MESH_HBEZIER_1D(self)
 
      CLASS DEFAULT
         STOP 'FREE_MESH: unexpected type for self object!'
@@ -147,66 +296,37 @@ CONTAINS
      ! LOCAL
      INTEGER :: li_err 
 
-     DEALLOCATE ( self % opr_knot ) 
+     DEALLOCATE ( self % opr_knots ) 
+     DEALLOCATE ( self % opr_control_points ) 
 
   END SUBROUTINE FREE_MESH_BSPLINES_1D
   ! .........................................................
 
-  ! .........................................................
-  SUBROUTINE FREE_MESH_FOURIER_1D(self)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_FOURIER), INTENT(INOUT)  :: self
-     ! LOCAL
-     INTEGER :: li_err 
-
-  END SUBROUTINE FREE_MESH_FOURIER_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE FREE_MESH_HBEZIER_1D(self)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_HBEZIER), INTENT(INOUT)  :: self
-     ! LOCAL
-     INTEGER :: li_err 
-
-  END SUBROUTINE FREE_MESH_HBEZIER_1D
-  ! .........................................................
+!  ! .........................................................
+!  SUBROUTINE FREE_MESH_FOURIER_1D(self)
+!  IMPLICIT NONE
+!     TYPE(DEF_MESH_1D_FOURIER), INTENT(INOUT)  :: self
+!     ! LOCAL
+!     INTEGER :: li_err 
+!
+!  END SUBROUTINE FREE_MESH_FOURIER_1D
+!  ! .........................................................
+!
+!  ! .........................................................
+!  SUBROUTINE FREE_MESH_HBEZIER_1D(self)
+!  IMPLICIT NONE
+!     TYPE(DEF_MESH_1D_HBEZIER), INTENT(INOUT)  :: self
+!     ! LOCAL
+!     INTEGER :: li_err 
+!
+!  END SUBROUTINE FREE_MESH_HBEZIER_1D
+!  ! .........................................................
 
   ! .........................................................
   subroutine INIT_MESH_1D_BSPLINE ( self, ai_type )
   implicit none
      TYPE(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: self
      integer  :: ai_type
-     ! LOCAL VARIABLES
-     integer  :: li_i
-     integer  :: li_nu ! number of continuity condition for periodic vector knot		
-     real(SPI_RK), dimension ( self % oi_n + self % oi_p + 1 ) :: lpr_knot
-
-     if ( self % oi_n < self % oi_p + 1 ) then
-        STOP "Error INIT_MESH_1D_BSPLINE: you must have N >= p + 1"
-     end if
-     
-     ! ... knots
-     self % opr_knot ( 1 : self % oi_p + 1 ) = 0.0
-     do li_i = 1, self % oi_n - self % oi_p - 1
-        self % opr_knot ( self % oi_p + 1 + li_i ) = li_i * 1.0 / ( self % oi_n - self % oi_p )
-     end do 
-     self % opr_knot ( self % oi_n + 1 : self % oi_n + self % oi_p + 1 ) = 1.0
-                                     
-     if ( ai_type == SPI_BC_PERIODIC ) then
-        li_nu = self % oi_p
-        
-        lpr_knot ( : ) = self % opr_knot ( : )
-        call convert_to_periodic_knots ( lpr_Knot ( : ), self % oi_n, self % oi_p, li_nu, self % opr_knot ( : ) )
-     end if
-     ! ...
-
-     ! ... control points
-     self % opr_control_points = 0.0
-     do li_i = 1, self % oi_n 
-        self % opr_control_points( li_i ) = (li_i - 1) * 1.0 / (self % oi_n - 1)
-     end do 
-     ! ...
   end subroutine INIT_MESH_1D_BSPLINE
   ! .........................................................
 

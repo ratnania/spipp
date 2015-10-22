@@ -22,7 +22,7 @@ MODULE SPI_BASIS_DEF
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_ABSTRACT) :: DEF_BASIS_1D
      CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
 
-     ! ... (n_elements, n_non_vanishing_functions, n_points_per_element)
+     ! ... n_elements, n_points_per_element, n_non_vanishing_functions_per_element
      REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_0
      REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_p, TestfT_pp 
   END TYPE DEF_BASIS_1D
@@ -30,8 +30,6 @@ MODULE SPI_BASIS_DEF
 
 ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_BSPLINE
-     REAL(SPI_RK), DIMENSION(:), POINTER :: ptr_knot => NULL()
-
      CLASS(DEF_MESH_1D_BSPLINE), POINTER :: ptr_mesh => NULL()
   END TYPE DEF_BASIS_1D_BSPLINE
 ! ..........................................................        

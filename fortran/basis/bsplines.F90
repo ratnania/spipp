@@ -31,15 +31,20 @@ CONTAINS
    IMPLICIT NONE
      CLASS(DEF_BASIS_1D_BSPLINE)       , INTENT(INOUT) :: self
      CLASS(DEF_MESH_1D_BSPLINE), TARGET, INTENT(INOUT) :: ao_mesh
+     ! LOCAL
+     INTEGER :: n_elements
+     INTEGER :: n_points
 
      self % ptr_mesh => ao_mesh
-     self % ptr_knot => ao_mesh % opr_knot 
 
      self % oi_n_order = self % ptr_mesh % oi_p + 1 
 
-     ALLOCATE(self % TestfT_0 (self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
-     ALLOCATE(self % TestfT_p (self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
-     ALLOCATE(self % TestfT_pp(self % ptr_quad % oi_n_points, self % ptr_mesh % oi_p + 1, 1))
+     n_elements = ao_mesh % n_elements 
+     n_points   = self % ptr_quad % oi_n_points 
+
+     ALLOCATE(self % TestfT_0 (n_elements, n_points, self % oi_n_order))
+     ALLOCATE(self % TestfT_p (n_elements, n_points, self % oi_n_order))
+     ALLOCATE(self % TestfT_pp(n_elements, n_points, self % oi_n_order))
 
    END SUBROUTINE CREATE_BASIS_1D_BSPLINE
    ! ...................................................
@@ -65,21 +70,25 @@ CONTAINS
    IMPLICIT NONE
      CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
      ! LOCAL
-     INTEGER       :: i_point
-     INTEGER       :: i_element
+     INTEGER       :: li_ig
      REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B     
      REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_s   
      REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_ss  
-     INTEGER :: n_points
+     INTEGER :: li_n_points
+     INTEGER :: i_element
+     REAL(SPI_RK) :: lr_x
 
-     n_points = SIZE(apr_points, 1)
-    
-     DO i_element = 1, self % ptr_mesh % oi_n_elmts 
-        DO i_point = 1, n_points
-           CALL EVALUATE_BASIS_1D_BSPLINE(self, apr_points(li_ig), B, B_s, B_ss)
-           self % TestfT_0  (i_element, :, i_point) = B   (:)
-           self % TestfT_p  (i_element, :, i_point) = B_s (:)
-           self % TestfT_pp (i_element, :, i_point) = B_ss(:)
+     DO i_element=1, self % ptr_mesh % n_elements 
+!     DO i_element=self % ptr_mesh % n_elements, self % ptr_mesh % n_elements 
+        DO li_ig = 1, self % ptr_quad % oi_n_points
+           lr_x = self % ptr_mesh % opr_points(i_element,li_ig)
+!           print *, lr_x
+           CALL EVALUATE_BASIS_1D_BSPLINE(self, lr_x, B, B_s, B_ss)
+           print *, lr_x, B
+
+           self % TestfT_0  (i_element, li_ig, :) = B   (:)
+           self % TestfT_p  (i_element, li_ig, :) = B_s (:)
+           self % TestfT_pp (i_element, li_ig, :) = B_ss(:)
         END DO
      END DO
 
@@ -101,16 +110,16 @@ CONTAINS
     ! LOCAL
     INTEGER, PARAMETER :: N_DERIV = 2
     REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % oi_p, 0:N_DERIV) :: lpr_dbatx
+    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p) :: lpr_knots
     INTEGER :: li_span
 
-    CALL FindSpan( self % ptr_mesh % oi_p, &
-                 & self % ptr_mesh % oi_n, &
-                 & self % ptr_knot       , &
-                 & s, li_span)
-    
+    lpr_knots(0:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p) = &
+            & self % ptr_mesh % opr_knots(1:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p + 1)
+
+    li_span = -1
     CALL EvalBasisFunsDers( self % ptr_mesh % oi_p, &
-                          & self % ptr_mesh % oi_n, &
-                          & self % ptr_knot       , &
+                          & self % ptr_mesh % oi_n + self % ptr_mesh % oi_p, &
+                          & lpr_knots, &
                           & s, N_DERIV, li_span, lpr_dbatx)
 
     B(:)    = lpr_dbatx(:,0)

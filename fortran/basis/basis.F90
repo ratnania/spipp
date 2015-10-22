@@ -37,29 +37,29 @@ CONTAINS
         END SELECT
      ! ...
 
-     ! ...
-     CLASS IS (DEF_BASIS_1D_FOURIER)
-        SELECT TYPE (ao_mesh)
-        CLASS IS (DEF_MESH_1D_FOURIER)
-           self % ptr_quad => ao_quad
-
-           CALL CREATE_BASIS_1D_FOURIER(self, ao_mesh)
-        CLASS DEFAULT
-           STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
-        END SELECT
-     ! ...
-
-     ! ...
-     CLASS IS (DEF_BASIS_1D_HBEZIER)
-        SELECT TYPE (ao_mesh)
-        CLASS IS (DEF_MESH_1D_HBEZIER)
-           self % ptr_quad => ao_quad
-
-           CALL CREATE_BASIS_1D_HBEZIER(self, ao_mesh)
-        CLASS DEFAULT
-           STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
-        END SELECT
-     ! ...
+!     ! ...
+!     CLASS IS (DEF_BASIS_1D_FOURIER)
+!        SELECT TYPE (ao_mesh)
+!        CLASS IS (DEF_MESH_1D_FOURIER)
+!           self % ptr_quad => ao_quad
+!
+!           CALL CREATE_BASIS_1D_FOURIER(self, ao_mesh)
+!        CLASS DEFAULT
+!           STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
+!        END SELECT
+!     ! ...
+!
+!     ! ...
+!     CLASS IS (DEF_BASIS_1D_HBEZIER)
+!        SELECT TYPE (ao_mesh)
+!        CLASS IS (DEF_MESH_1D_HBEZIER)
+!           self % ptr_quad => ao_quad
+!
+!           CALL CREATE_BASIS_1D_HBEZIER(self, ao_mesh)
+!        CLASS DEFAULT
+!           STOP 'CREATE_BASIS: unexpected type for ao_mesh object!'
+!        END SELECT
+!     ! ...
 
      CLASS DEFAULT
         STOP 'CREATE_BASIS: unexpected type for self object!'
@@ -79,10 +79,10 @@ CONTAINS
      SELECT TYPE (self)
      CLASS IS (DEF_BASIS_1D_BSPLINE)
         CALL FREE_BASIS_1D_BSPLINE(self)
-     CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL FREE_BASIS_1D_HBEZIER(self)
-     CLASS IS (DEF_BASIS_1D_FOURIER)
-        CALL FREE_BASIS_1D_FOURIER(self)
+!     CLASS IS (DEF_BASIS_1D_HBEZIER)
+!        CALL FREE_BASIS_1D_HBEZIER(self)
+!     CLASS IS (DEF_BASIS_1D_FOURIER)
+!        CALL FREE_BASIS_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'FREE_BASIS: unexpected type for self object!'
      END SELECT
@@ -101,10 +101,10 @@ CONTAINS
      SELECT TYPE (self)
      CLASS IS (DEF_BASIS_1D_BSPLINE)
         CALL RESET_BASIS_1D_BSPLINE(self)
-     CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL RESET_BASIS_1D_HBEZIER(self)
-     CLASS IS (DEF_BASIS_1D_FOURIER)
-        CALL RESET_BASIS_1D_FOURIER(self)
+!     CLASS IS (DEF_BASIS_1D_HBEZIER)
+!        CALL RESET_BASIS_1D_HBEZIER(self)
+!     CLASS IS (DEF_BASIS_1D_FOURIER)
+!        CALL RESET_BASIS_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'RESET_BASIS: unexpected type for self object!'
      END SELECT
@@ -127,15 +127,15 @@ CONTAINS
         CALL UPDATE_BASIS_1D_BSPLINE(self)
      ! ...
 
-     ! ...
-     CLASS IS (DEF_BASIS_1D_FOURIER)
-        CALL UPDATE_BASIS_1D_FOURIER(self)
-     ! ...
-
-     ! ...
-     CLASS IS (DEF_BASIS_1D_HBEZIER)
-        CALL UPDATE_BASIS_1D_HBEZIER(self)
-     ! ...
+!     ! ...
+!     CLASS IS (DEF_BASIS_1D_FOURIER)
+!        CALL UPDATE_BASIS_1D_FOURIER(self, apr_points)
+!     ! ...
+!
+!     ! ...
+!     CLASS IS (DEF_BASIS_1D_HBEZIER)
+!        CALL UPDATE_BASIS_1D_HBEZIER(self, apr_points)
+!     ! ...
 
      CLASS DEFAULT
         STOP 'UPDATE_BASIS: unexpected type for self object!'
