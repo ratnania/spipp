@@ -40,26 +40,31 @@ MODULE SPI_MESH_DEF
   ! .........................................................
 
   ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_1D_HBEZIER
-  END TYPE DEF_MESH_1D_HBEZIER
-  ! .........................................................
-
-  ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_1D_FOURIER
-     INTEGER :: oi_n_plane
-  END TYPE DEF_MESH_1D_FOURIER
-  ! .........................................................
-
-  ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_1D_BSPLINE
-     integer :: oi_n 
-     integer :: oi_p
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D_BSPLINE
+     integer :: n 
+     integer :: p
      INTEGER :: n_dim
 
      !> KNOT VECTOR FOR EACH DIRECTION
-     real(SPI_RK), dimension (:), ALLOCATABLE :: opr_knots
+     real(SPI_RK), dimension (:), ALLOCATABLE :: knots
      REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: control_points
   END TYPE DEF_MESH_1D_BSPLINE
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_2D_BSPLINE
+     integer :: n_u 
+     integer :: n_v
+     integer :: p_u
+     integer :: p_v
+     INTEGER :: n_dim
+
+     !> KNOT VECTOR FOR EACH DIRECTION
+     real(SPI_RK), dimension (:), ALLOCATABLE :: knots_u
+     real(SPI_RK), dimension (:), ALLOCATABLE :: knots_v
+
+     REAL(SPI_RK), DIMENSION (:,:,:), ALLOCATABLE :: control_points
+  END TYPE DEF_MESH_2D_BSPLINE
   ! .........................................................
 
 END MODULE SPI_MESH_DEF

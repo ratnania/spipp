@@ -38,10 +38,10 @@ implicit none
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
    CALL CREATE_MESH(lo_mesh, lo_quad, N, P, apr_knots=KNOTS) 
 
-   PRINT *, ">>> N, P :", lo_mesh % oi_N, lo_mesh % oi_P
+   PRINT *, ">>> N, P :", lo_mesh % n, lo_mesh % p
 
    PRINT *, ">>> knots"
-   PRINT *, lo_mesh % opr_knots
+   PRINT *, lo_mesh % knots
 
    PRINT *, ">>> grid"
    PRINT *, lo_mesh % opr_grid

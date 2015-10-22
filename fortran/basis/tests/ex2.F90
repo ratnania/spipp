@@ -52,7 +52,7 @@ implicit none
 !      PRINT *, lo_mesh % opr_points(e,:)
 !   END DO
 
-   ALLOCATE(COEFFS_LOC(lo_mesh % n_elements, lo_mesh % oi_p + 1))
+   ALLOCATE(COEFFS_LOC(lo_mesh % n_elements, lo_mesh % p + 1))
    ALLOCATE(s_at_quad(lo_mesh % n_elements, lo_quad % oi_n_points))
   
    ! ... TODO set coeff values
@@ -61,7 +61,7 @@ implicit none
       COEFFS_LOC = 1.0 
       s_at_quad = 0.0
       DO e = 1, lo_mesh % n_elements 
-         DO b = 1, lo_mesh % oi_p + 1 
+         DO b = 1, lo_mesh % p + 1 
             s_at_quad(e, :) = s_at_quad(e, :) + lo_basis % B_0(e, :, b) * COEFFS_LOC(e, b)
          END DO
       END DO

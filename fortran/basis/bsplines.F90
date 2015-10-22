@@ -37,7 +37,7 @@ CONTAINS
 
      self % ptr_mesh => ao_mesh
 
-     self % oi_n_order = self % ptr_mesh % oi_p + 1 
+     self % oi_n_order = self % ptr_mesh % p + 1 
 
      n_elements = ao_mesh % n_elements 
      n_points   = self % ptr_quad % oi_n_points 
@@ -74,9 +74,9 @@ CONTAINS
      CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
      ! LOCAL
      INTEGER       :: li_ig
-     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B     
-     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_s   
-     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1) :: B_ss  
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1) :: B     
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1) :: B_s   
+     REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1) :: B_ss  
      INTEGER :: li_n_points
      INTEGER :: i_element
      INTEGER :: i_span
@@ -106,24 +106,24 @@ CONTAINS
     !< s-coordinate in the element
     REAL(KIND=SPI_RK), INTENT(IN)  :: s          
     !< Basis functions
-    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B     
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1), INTENT(INOUT) :: B     
     !< Basis functions derived with respect to s
-    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B_s   
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1), INTENT(INOUT) :: B_s   
     !< Basis functions derived two times with respect to s
-    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % oi_p + 1), INTENT(INOUT) :: B_ss  
+    REAL(KIND=SPI_RK), DIMENSION(self % ptr_mesh % p + 1), INTENT(INOUT) :: B_ss  
     INTEGER, INTENT(INOUT) :: span
     ! LOCAL
     INTEGER, PARAMETER :: N_DERIV = 2
-    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % oi_p, 0:N_DERIV) :: lpr_dbatx
-    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p) :: lpr_knots
+    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % p, 0:N_DERIV) :: lpr_dbatx
+    REAL(SPI_RK), DIMENSION(0:self % ptr_mesh % n + self % ptr_mesh % p) :: lpr_knots
     INTEGER :: i_element
 
-    lpr_knots(0:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p) = &
-            & self % ptr_mesh % opr_knots(1:self % ptr_mesh % oi_n + self % ptr_mesh % oi_p + 1)
+    lpr_knots(0:self % ptr_mesh % n + self % ptr_mesh % p) = &
+            & self % ptr_mesh % knots(1:self % ptr_mesh % n + self % ptr_mesh % p + 1)
 
     span = -1
-    CALL EvalBasisFunsDers( self % ptr_mesh % oi_p, &
-                          & self % ptr_mesh % oi_n + self % ptr_mesh % oi_p, &
+    CALL EvalBasisFunsDers( self % ptr_mesh % p, &
+                          & self % ptr_mesh % n + self % ptr_mesh % p, &
                           & lpr_knots, &
                           & s, N_DERIV, span, lpr_dbatx)
 

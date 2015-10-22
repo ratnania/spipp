@@ -72,9 +72,9 @@ MODULE SPI_BLACKBOX_BSPLINE
      self % Xp_s1s1 = 0.0d0
 
      DO i_point = 1, self % ptr_quad %  oi_n_points
-        DO i_basis = 1, self % ptr_mesh % oi_p + 1 
+        DO i_basis = 1, self % ptr_mesh % p + 1 
            DO i_element = 1, self % ptr_mesh % n_elements 
-              i_ctrl_pt = i_basis + self % ptr_basis % opi_i_begin(i_element) - self % ptr_mesh % oi_p 
+              i_ctrl_pt = i_basis + self % ptr_basis % opi_i_begin(i_element) - self % ptr_mesh % p 
 
               self % Xp_0(i_element, i_point, :) = self % Xp_0(i_element, i_point, :) &
                       & + self % ptr_basis % B_0(i_element, i_point, i_basis) * self % ptr_mesh % control_points(i_ctrl_pt, :)

@@ -15,15 +15,15 @@ CONTAINS
      INTEGER :: n_elements
      INTEGER :: i
      INTEGER :: i_current
-     REAL(SPI_RK), DIMENSION(self % oi_n + self % oi_p + 1) :: lpr_grid
+     REAL(SPI_RK), DIMENSION(self % n + self % p + 1) :: lpr_grid
      REAL(SPI_RK) :: min_current
 
      lpr_grid = SPI_INT_DEFAULT * 1.0 
 
      i_current = 1
-     lpr_grid(i_current) = MINVAL(self % opr_knots)
-     DO i=1, self % oi_n + self % oi_p
-        min_current = MINVAL(self % opr_knots(i : self % oi_n + self % oi_p + 1))
+     lpr_grid(i_current) = MINVAL(self % knots)
+     DO i=1, self % n + self % p
+        min_current = MINVAL(self % knots(i : self % n + self % p + 1))
         IF ( min_current > lpr_grid(i_current) ) THEN
                 i_current = i_current + 1
                 lpr_grid(i_current) = min_current
@@ -47,11 +47,11 @@ CONTAINS
       real(SPI_RK), dimension (:), INTENT(IN):: apr_knots
      ! LOCAL
 
-     self % oi_n = ai_n
-     self % oi_p = ai_p
+     self % n = ai_n
+     self % p = ai_p
 
-     ALLOCATE ( self % opr_knots( ai_n + ai_p + 1 ) ) 
-     self % opr_knots = apr_knots
+     ALLOCATE ( self % knots( ai_n + ai_p + 1 ) ) 
+     self % knots = apr_knots
 
   END SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D
   ! .........................................................
@@ -70,35 +70,34 @@ CONTAINS
      real(SPI_RK), dimension ( ai_n + ai_p + 1 ) :: lpr_knot
 
      self % oi_type_bc = ai_type_bc
-     self % oi_p       = ai_p
-     self % oi_n       = ai_n
+     self % p       = ai_p
+     self % n       = ai_n
      
      if ( ai_type_bc == SPI_BC_PERIODIC ) then
-        self % oi_n =  self % oi_n + self % oi_p - 1
+        self % n =  self % n + self % p - 1
      end if
                                      
-     self % n_elements = self % oi_n - ai_p
-     self % oi_nen     = ai_p + 1
+     self % n_elements = self % n - ai_p
      
-     ALLOCATE ( self % opr_knots ( self % oi_n + ai_p + 1 ) ) 
+     ALLOCATE ( self % knots ( self % n + ai_p + 1 ) ) 
      
      ! INITIALIZING VECTOR KNOTS
-     if ( self % oi_n < self % oi_p + 1 ) then
+     if ( self % n < self % p + 1 ) then
         STOP "Error INIT_MESH_1D_BSPLINE: you must have N >= p + 1"
      end if
      
      ! ... knots
-     self % opr_knots ( 1 : self % oi_p + 1 ) = 0.0
-     do li_i = 1, self % oi_n - self % oi_p - 1
-        self % opr_knots ( self % oi_p + 1 + li_i ) = li_i * 1.0 / ( self % oi_n - self % oi_p )
+     self % knots ( 1 : self % p + 1 ) = 0.0
+     do li_i = 1, self % n - self % p - 1
+        self % knots ( self % p + 1 + li_i ) = li_i * 1.0 / ( self % n - self % p )
      end do 
-     self % opr_knots ( self % oi_n + 1 : self % oi_n + self % oi_p + 1 ) = 1.0
+     self % knots ( self % n + 1 : self % n + self % p + 1 ) = 1.0
                                      
      if ( ai_type_bc == SPI_BC_PERIODIC ) then
-        li_nu = self % oi_p
+        li_nu = self % p
         
-        lpr_knot ( : ) = self % opr_knots ( : )
-        call convert_to_periodic_knots ( lpr_Knot ( : ), self % oi_n, self % oi_p, li_nu, self % opr_knots ( : ) )
+        lpr_knot ( : ) = self % knots ( : )
+        call convert_to_periodic_knots ( lpr_Knot ( : ), self % n, self % p, li_nu, self % knots ( : ) )
      end if
      ! ...
 
@@ -116,7 +115,7 @@ CONTAINS
      n_dim =  SIZE(control_points_1d, 2) 
      self % n_dim = n_dim
 
-     ALLOCATE ( self % control_points( self % oi_n, n_dim ) ) 
+     ALLOCATE ( self % control_points( self % n, n_dim ) ) 
 
      ! ... control points
      self % control_points = control_points_1d 
@@ -133,12 +132,12 @@ CONTAINS
 
      n_dim = 1 
      self % n_dim = n_dim
-     ALLOCATE ( self % control_points( self % oi_n, n_dim ) ) 
+     ALLOCATE ( self % control_points( self % n, n_dim ) ) 
 
      ! ... control points
      self % control_points = 0.0
-     do li_i = 1, self % oi_n 
-        self % control_points( li_i, 1 ) = (li_i - 1) * 1.0d0 / (self % oi_n - 1)
+     do li_i = 1, self % n 
+        self % control_points( li_i, 1 ) = (li_i - 1) * 1.0d0 / (self % n - 1)
      end do 
      ! ...
   END SUBROUTINE INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT
@@ -184,7 +183,7 @@ CONTAINS
      ! LOCAL
      INTEGER :: li_err 
 
-     DEALLOCATE ( self % opr_knots ) 
+     DEALLOCATE ( self % knots ) 
 
   END SUBROUTINE FREE_MESH_BSPLINES_1D
   ! .........................................................

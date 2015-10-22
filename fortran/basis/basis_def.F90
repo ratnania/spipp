@@ -35,16 +35,4 @@ MODULE SPI_BASIS_DEF
   END TYPE DEF_BASIS_1D_BSPLINE
 ! ..........................................................        
 
-! ..........................................................        
-  TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_FOURIER
-     CLASS(DEF_MESH_1D_FOURIER), POINTER :: ptr_mesh => NULL()
-  END TYPE DEF_BASIS_1D_FOURIER
-! ..........................................................        
-
-! ..........................................................        
-  TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_HBEZIER
-     CLASS(DEF_MESH_1D_HBEZIER), POINTER :: ptr_mesh => NULL()
-  END TYPE DEF_BASIS_1D_HBEZIER
-! ..........................................................        
-
 END MODULE SPI_BASIS_DEF

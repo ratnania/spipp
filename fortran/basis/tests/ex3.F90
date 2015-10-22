@@ -65,7 +65,7 @@ implicit none
    CALL CREATE_BASIS(lo_basis_v, lo_mesh_v, lo_quad_v) 
    ! ...
 
-   ALLOCATE(COEFFS_LOC(lo_mesh_u % n_elements, lo_mesh_v % n_elements, lo_mesh_u % oi_p + 1, lo_mesh_v % oi_p + 1))
+   ALLOCATE(COEFFS_LOC(lo_mesh_u % n_elements, lo_mesh_v % n_elements, lo_mesh_u % p + 1, lo_mesh_v % p + 1))
    ALLOCATE(s_at_quad(lo_mesh_u % n_elements * lo_mesh_v % n_elements, lo_quad_u % oi_n_points * lo_quad_v % oi_n_points))
   
 !   ! ...
@@ -76,8 +76,8 @@ implicit none
 !      e = 1
 !      DO e_u = 1, lo_mesh_u % n_elements 
 !         DO e_v = 1, lo_mesh_v % n_elements 
-!            DO b_u = 1, lo_mesh_u % oi_p + 1 
-!               DO b_v = 1, lo_mesh_v % oi_p + 1 
+!            DO b_u = 1, lo_mesh_u % p + 1 
+!               DO b_v = 1, lo_mesh_v % p + 1 
 !                  i = 1
 !                  DO i_u = 1, lo_quad_u %  oi_n_points
 !                     B_at_u = lo_basis_u % B_0(e_u, i_u, b_u)
@@ -102,8 +102,8 @@ implicit none
    DO i_iteration=1, n_iterations
       COEFFS_LOC = 1.0 
       s_at_quad = 0.0
-      DO b_u = 1, lo_mesh_u % oi_p + 1 
-         DO b_v = 1, lo_mesh_v % oi_p + 1 
+      DO b_u = 1, lo_mesh_u % p + 1 
+         DO b_v = 1, lo_mesh_v % p + 1 
             i = 1
             DO i_u = 1, lo_quad_u %  oi_n_points
                DO i_v = 1, lo_quad_u %  oi_n_points
@@ -131,8 +131,8 @@ implicit none
    DO i_iteration=1, n_iterations
       COEFFS_LOC = 1.0 
       integral = 0.0
-      DO b_u = 1, lo_mesh_u % oi_p + 1 
-         DO b_v = 1, lo_mesh_v % oi_p + 1 
+      DO b_u = 1, lo_mesh_u % p + 1 
+         DO b_v = 1, lo_mesh_v % p + 1 
             i = 1
             DO i_u = 1, lo_quad_u %  oi_n_points
                W_at_u = lo_quad_u % opr_weights(i_u)

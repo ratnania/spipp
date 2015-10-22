@@ -75,18 +75,4 @@ MODULE SPI_BLACKBOX_DEF
   END TYPE DEF_BLACKBOX_3D_BSPLINE
   ! ..........................................................        
 
-  ! ..........................................................        
-  TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_1D) :: DEF_BLACKBOX_1D_FOURIER
-     CLASS(DEF_BASIS_1D_FOURIER), POINTER :: ptr_basis => NULL()
-     CLASS(DEF_MESH_1D_FOURIER), POINTER :: ptr_mesh => NULL()
-  END TYPE DEF_BLACKBOX_1D_FOURIER
-  ! ..........................................................        
-
-  ! ..........................................................        
-  TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_1D) :: DEF_BLACKBOX_1D_HBEZIER
-     CLASS(DEF_BASIS_1D_HBEZIER), POINTER :: ptr_basis => NULL()
-     CLASS(DEF_MESH_1D_HBEZIER), POINTER :: ptr_mesh => NULL()
-  END TYPE DEF_BLACKBOX_1D_HBEZIER
-  ! ..........................................................        
-
 END MODULE SPI_BLACKBOX_DEF
