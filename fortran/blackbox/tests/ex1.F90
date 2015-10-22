@@ -59,8 +59,9 @@ implicit none
    ! ...
 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-   CALL CREATE_MESH(lo_mesh, lo_quad, N, P &
-           & , apr_knots=KNOTS &
+   CALL CREATE_MESH(lo_mesh &
+           & , quad_u=lo_quad, n_u=N, p_u=P &
+           & , knots_u=KNOTS &
            & , control_points_1d=control_points_1d) 
    CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
    CALL CREATE_BLACKBOX(lo_bbox, lo_mesh, lo_basis, lo_quad)

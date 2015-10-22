@@ -9,32 +9,51 @@ MODULE SPI_MESH
 CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH(self, ao_quad, ai_n, ai_p, ai_type_bc, apr_knots, control_points_1d)
+  SUBROUTINE CREATE_MESH(self &
+                  & , quad_u &
+                  & , quad_v &
+                  & , n_u &
+                  & , n_v &
+                  & , p_u &
+                  & , p_v &
+                  & , type_bc_u &
+                  & , type_bc_v &
+                  & , knots_u &
+                  & , knots_v &
+                  & , control_points_1d &
+                  & , control_points_2d &
+                  & )
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD
   IMPLICIT NONE
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: self 
-     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET , INTENT(INOUT) :: ao_quad 
-     INTEGER               , INTENT(IN)   :: ai_n
-     INTEGER               , INTENT(IN)   :: ai_p
-     INTEGER               , OPTIONAL, INTENT(IN)   :: ai_type_bc
-     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
+     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET, OPTIONAL, INTENT(INOUT) :: quad_u 
+     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET, OPTIONAL, INTENT(INOUT) :: quad_v 
+     INTEGER               , OPTIONAL, INTENT(IN)   :: n_u
+     INTEGER               , OPTIONAL, INTENT(IN)   :: n_v
+     INTEGER               , OPTIONAL, INTENT(IN)   :: p_u
+     INTEGER               , OPTIONAL, INTENT(IN)   :: p_v
+     INTEGER               , OPTIONAL, INTENT(IN)   :: type_bc_u
+     INTEGER               , OPTIONAL, INTENT(IN)   :: type_bc_v
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: knots_u
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: knots_v
      real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points_1d
+     real(SPI_RK), dimension (:,:,:), OPTIONAL, INTENT(IN) :: control_points_2d
      ! LOCAL
      INTEGER :: li_err     
 
-     self % oi_n_vtex_per_elmt = 2  
-
      SELECT TYPE (self)
      CLASS IS (DEF_MESH_1D_BSPLINE)
-        CALL CREATE_MESH_BSPLINES_1D(self, &
-                & ai_n, &
-                & ai_p, & 
-                & ai_type_bc=ai_type_bc, &
-                & apr_knots=apr_knots, &
-                & control_points=control_points_1d&
-                & )
-        CALL CREATE_MESH_POINTS_1D(self, ao_quad) 
+        IF ((PRESENT(n_u)) .AND. (PRESENT(p_u)) .AND. (PRESENT(quad_u))) THEN
+           CALL CREATE_MESH_BSPLINES_1D(self, &
+                   & n_u, &
+                   & p_u, & 
+                   & type_bc=type_bc_u, &
+                   & knots=knots_u, &
+                   & control_points=control_points_1d&
+                   & )
+           CALL CREATE_MESH_POINTS_1D(self, quad_u) 
+        END IF
 
      CLASS DEFAULT
         STOP 'CREATE_MESH: unexpected type for self object!'

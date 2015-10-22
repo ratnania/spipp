@@ -55,13 +55,13 @@ implicit none
 
    ! ... u
    CALL CREATE_QUADRATURE(lo_quad_u, SPI_QUADRATURES_LEGENDRE, P) 
-   CALL CREATE_MESH(lo_mesh_u, lo_quad_u, N, P, apr_knots=KNOTS) 
+   CALL CREATE_MESH(lo_mesh_u, quad_u=lo_quad_u, n_u=N, p_u=P, knots_u=KNOTS) 
    CALL CREATE_BASIS(lo_basis_u, lo_mesh_u, lo_quad_u) 
    ! ...
 
    ! ... v
    CALL CREATE_QUADRATURE(lo_quad_v, SPI_QUADRATURES_LEGENDRE, P) 
-   CALL CREATE_MESH(lo_mesh_v, lo_quad_v, N, P, apr_knots=KNOTS) 
+   CALL CREATE_MESH(lo_mesh_v, quad_u=lo_quad_u, n_u=N, p_u=P, knots_u=KNOTS) 
    CALL CREATE_BASIS(lo_basis_v, lo_mesh_v, lo_quad_v) 
    ! ...
 

@@ -39,41 +39,41 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots)
+  SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, knots)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
      INTEGER, INTENT(IN)    :: ai_n
      INTEGER, INTENT(IN)    :: ai_p
-      real(SPI_RK), dimension (:), INTENT(IN):: apr_knots
+      real(SPI_RK), dimension (:), INTENT(IN):: knots
      ! LOCAL
 
      self % n = ai_n
      self % p = ai_p
 
      ALLOCATE ( self % knots( ai_n + ai_p + 1 ) ) 
-     self % knots = apr_knots
+     self % knots = knots
 
   END SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc)
+  SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, type_bc)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
      INTEGER, INTENT(IN)    :: ai_n
      INTEGER, INTENT(IN)    :: ai_p
-     INTEGER, INTENT(IN)    :: ai_type_bc
+     INTEGER, INTENT(IN)    :: type_bc
      ! LOCAL
      INTEGER :: li_err 
      integer  :: li_i
      integer  :: li_nu ! number of continuity condition for periodic vector knot		
      real(SPI_RK), dimension ( ai_n + ai_p + 1 ) :: lpr_knot
 
-     self % oi_type_bc = ai_type_bc
+     self % type_bc = type_bc
      self % p       = ai_p
      self % n       = ai_n
      
-     if ( ai_type_bc == SPI_BC_PERIODIC ) then
+     if ( type_bc == SPI_BC_PERIODIC ) then
         self % n =  self % n + self % p - 1
      end if
                                      
@@ -93,7 +93,7 @@ CONTAINS
      end do 
      self % knots ( self % n + 1 : self % n + self % p + 1 ) = 1.0
                                      
-     if ( ai_type_bc == SPI_BC_PERIODIC ) then
+     if ( type_bc == SPI_BC_PERIODIC ) then
         li_nu = self % p
         
         lpr_knot ( : ) = self % knots ( : )
@@ -144,25 +144,25 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc, apr_knots, control_points)
+  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, type_bc, knots, control_points)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
      INTEGER              , INTENT(IN)    :: ai_n
      INTEGER              , INTENT(IN)    :: ai_p
-     INTEGER              , OPTIONAL, INTENT(IN)    :: ai_type_bc
-     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
+     INTEGER              , OPTIONAL, INTENT(IN)    :: type_bc
+     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: knots
      real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points
      ! LOCAL
      INTEGER :: li_err 
 
-     IF ( (.NOT. PRESENT(apr_knots)) &
-            & .AND. (PRESENT(ai_type_bc)) &
+     IF ( (.NOT. PRESENT(knots)) &
+            & .AND. (PRESENT(type_bc)) &
             & ) THEN
-        CALL INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc) 
+        CALL INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, type_bc) 
      END IF
 
-     IF ( ( PRESENT(apr_knots)) ) THEN
-        CALL INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots) 
+     IF ( ( PRESENT(knots)) ) THEN
+        CALL INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, knots) 
      END IF
 
      IF ( ( PRESENT(control_points)) ) THEN

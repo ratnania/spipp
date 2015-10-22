@@ -36,7 +36,7 @@ implicit none
    KNOTS(N+1:N+P+1) = 1.0
 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-   CALL CREATE_MESH(lo_mesh, lo_quad, N, P, apr_knots=KNOTS) 
+   CALL CREATE_MESH(lo_mesh, quad_u=lo_quad, n_u=N, p_u=P, knots_u=KNOTS) 
 
    PRINT *, ">>> N, P :", lo_mesh % n, lo_mesh % p
 

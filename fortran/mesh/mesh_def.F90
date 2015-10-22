@@ -21,12 +21,10 @@ MODULE SPI_MESH_DEF
   ! .........................................................
   TYPE, ABSTRACT, PUBLIC :: DEF_MESH_ABSTRACT
      INTEGER :: n_elements
-     INTEGER :: oi_n_vtex_per_elmt
 
-     !> NUBMER OF NON VANISHING BASIS 
-     INTEGER :: oi_nen
-     !> TYPE BOUNDARY CONDITION
-     INTEGER :: oi_type_bc
+     integer :: n 
+     integer :: p
+     INTEGER :: n_dim
 
      REAL(SPI_RK), dimension (:), allocatable :: opr_grid
      REAL(SPI_RK), dimension (:,:), allocatable :: opr_points
@@ -35,15 +33,8 @@ MODULE SPI_MESH_DEF
   ! .........................................................
 
   ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D
-  END TYPE DEF_MESH_1D
-  ! .........................................................
-
-  ! .........................................................
   TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D_BSPLINE
-     integer :: n 
-     integer :: p
-     INTEGER :: n_dim
+     INTEGER :: type_bc
 
      !> KNOT VECTOR FOR EACH DIRECTION
      real(SPI_RK), dimension (:), ALLOCATABLE :: knots
@@ -52,16 +43,9 @@ MODULE SPI_MESH_DEF
   ! .........................................................
 
   ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_2D_BSPLINE
-     integer :: n_u 
-     integer :: n_v
-     integer :: p_u
-     integer :: p_v
-     INTEGER :: n_dim
-
-     !> KNOT VECTOR FOR EACH DIRECTION
-     real(SPI_RK), dimension (:), ALLOCATABLE :: knots_u
-     real(SPI_RK), dimension (:), ALLOCATABLE :: knots_v
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_2D_BSPLINE
+     TYPE(DEF_MESH_1D_BSPLINE) :: mesh_u
+     TYPE(DEF_MESH_1D_BSPLINE) :: mesh_v
 
      REAL(SPI_RK), DIMENSION (:,:,:), ALLOCATABLE :: control_points
   END TYPE DEF_MESH_2D_BSPLINE
