@@ -26,46 +26,31 @@ implicit none
    TYPE(DEF_BASIS_1D_BSPLINE), TARGET :: lo_basis
    ! ... number of internal knots is = N - P - 1
 !   INTEGER, PARAMETER :: P = 3
-!   INTEGER, PARAMETER :: N = P + 5 
-   INTEGER, PARAMETER :: P = 1 
-   INTEGER, PARAMETER :: N = P + 4 
+   INTEGER, PARAMETER :: P = 2 
+   INTEGER, PARAMETER :: N = P + 1 + 3 
    REAL(SPI_RK), DIMENSION(N+P+1) :: KNOTS
    INTEGER :: li_elmt
-   INTEGER :: i, e
+   INTEGER :: i, e, i_point
 
    KNOTS(1:P+1) = 0.0
-   KNOTS(P+2) = 0.25
-   KNOTS(P+3) = 0.5
-!   KNOTS(P+4) = 0.5
-   KNOTS(N)   = 0.75
+   DO i =1, N - P - 1 
+      KNOTS(i+P+1) = i * 1.0 / (N-P) 
+   END DO
    KNOTS(N+1:N+P+1) = 1.0
 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, P) 
    CALL CREATE_MESH(lo_mesh, lo_quad, N, P, apr_knots=KNOTS) 
    CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
 
-   CALL RESET_BASIS(lo_basis) 
-
-
    PRINT *, ">>> points"
-   DO e = 1, 4
-      PRINT *, lo_mesh % opr_points(e,:)
+   DO e = 1, lo_mesh % n_elements 
+      print *, "========"
+      PRINT *, lo_mesh % opr_points(e, :)
+      print *, "   --- "
+      DO i_point = 1, P+1
+        PRINT *, lo_basis % B_0(e, i_point, :)
+      END DO
    END DO
-
-
-   CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS(lo_basis)
-   
-!   PRINT *, SIZE(lo_basis % TestfT_0,1)
-!   PRINT *, SIZE(lo_basis % TestfT_0,2)
-!   PRINT *, SIZE(lo_basis % TestfT_0,3)
-!   DO e = 1, 4
-!      PRINT *, ">>> element ", e
-!      DO i = 1, P+1 
-!         PRINT *, lo_basis % TestfT_0(e,i,:)
-!      END DO
-!   END DO
-!   PRINT *, lo_basis % TestfT_P
-!   PRINT *, lo_basis % TestfT_PP
 
    CALL FREE_BASIS(lo_basis) 
    CALL FREE_MESH(lo_mesh) 

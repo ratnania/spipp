@@ -66,6 +66,9 @@ CONTAINS
      END SELECT
      ! ...
 
+   CALL RESET_BASIS(self)
+   CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS(self)
+
    END SUBROUTINE CREATE_BASIS
    ! ...................................................
 

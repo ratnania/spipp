@@ -47,9 +47,6 @@ implicit none
    CALL CREATE_MESH(lo_mesh, lo_quad, N, P, apr_knots=KNOTS) 
    CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
 
-   CALL RESET_BASIS(lo_basis) 
-
-
 !   PRINT *, ">>> points"
 !   DO e = 1, 4
 !      PRINT *, lo_mesh % opr_points(e,:)
@@ -57,8 +54,6 @@ implicit none
 
    ALLOCATE(COEFFS_LOC(lo_mesh % n_elements, lo_mesh % oi_p + 1))
    ALLOCATE(s_at_quad(lo_mesh % n_elements, lo_quad % oi_n_points))
-
-   CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS(lo_basis)
   
    ! ... TODO set coeff values
    call cpu_time(start)
@@ -67,7 +62,7 @@ implicit none
       s_at_quad = 0.0
       DO e = 1, lo_mesh % n_elements 
          DO b = 1, lo_mesh % oi_p + 1 
-            s_at_quad(e, :) = s_at_quad(e, :) + lo_basis % TestfT_0(e, :, b) * COEFFS_LOC(e, b)
+            s_at_quad(e, :) = s_at_quad(e, :) + lo_basis % B_0(e, :, b) * COEFFS_LOC(e, b)
          END DO
       END DO
    END DO

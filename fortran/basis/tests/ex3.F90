@@ -65,14 +65,8 @@ implicit none
    CALL CREATE_BASIS(lo_basis_v, lo_mesh_v, lo_quad_v) 
    ! ...
 
-   CALL RESET_BASIS(lo_basis_u) 
-   CALL RESET_BASIS(lo_basis_v) 
-
    ALLOCATE(COEFFS_LOC(lo_mesh_u % n_elements, lo_mesh_v % n_elements, lo_mesh_u % oi_p + 1, lo_mesh_v % oi_p + 1))
    ALLOCATE(s_at_quad(lo_mesh_u % n_elements * lo_mesh_v % n_elements, lo_quad_u % oi_n_points * lo_quad_v % oi_n_points))
-
-   CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS(lo_basis_u)
-   CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS(lo_basis_v)
   
 !   ! ...
 !   call cpu_time(start)
@@ -86,9 +80,9 @@ implicit none
 !               DO b_v = 1, lo_mesh_v % oi_p + 1 
 !                  i = 1
 !                  DO i_u = 1, lo_quad_u %  oi_n_points
-!                     B_at_u = lo_basis_u % TestfT_0(e_u, i_u, b_u)
+!                     B_at_u = lo_basis_u % B_0(e_u, i_u, b_u)
 !                     DO i_v = 1, lo_quad_u %  oi_n_points
-!                        B_at_v = lo_basis_v % TestfT_0(e_v, i_v, b_v)
+!                        B_at_v = lo_basis_v % B_0(e_v, i_v, b_v)
 !                        s_at_quad(e, i) = s_at_quad(e, i) + B_at_u * B_at_v * COEFFS_LOC(e_u, e_v, b_u, b_v)
 !                        i = i + 1
 !                     END DO
@@ -115,9 +109,9 @@ implicit none
                DO i_v = 1, lo_quad_u %  oi_n_points
                   e = 1
                   DO e_u = 1, lo_mesh_u % n_elements 
-                     B_at_u = lo_basis_u % TestfT_0(e_u, i_u, b_u)
+                     B_at_u = lo_basis_u % B_0(e_u, i_u, b_u)
                      DO e_v = 1, lo_mesh_v % n_elements 
-                        B_at_v = lo_basis_v % TestfT_0(e_v, i_v, b_v)
+                        B_at_v = lo_basis_v % B_0(e_v, i_v, b_v)
                         s_at_quad(e, i) = s_at_quad(e, i) + B_at_u * B_at_v * COEFFS_LOC(e_u, e_v, b_u, b_v)
                         e = e + 1
                      END DO
@@ -147,9 +141,9 @@ implicit none
 
                   e = 1
                   DO e_u = 1, lo_mesh_u % n_elements 
-                     B_at_u = lo_basis_u % TestfT_0(e_u, i_u, b_u)
+                     B_at_u = lo_basis_u % B_0(e_u, i_u, b_u)
                      DO e_v = 1, lo_mesh_v % n_elements 
-                        B_at_v = lo_basis_v % TestfT_0(e_v, i_v, b_v)
+                        B_at_v = lo_basis_v % B_0(e_v, i_v, b_v)
                         integral = integral + W_at_u * W_at_v * B_at_u * B_at_v * COEFFS_LOC(e_u, e_v, b_u, b_v)
                         e = e + 1
                      END DO

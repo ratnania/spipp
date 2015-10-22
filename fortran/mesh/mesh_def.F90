@@ -57,8 +57,7 @@ MODULE SPI_MESH_DEF
       integer		:: oi_p	
 
       !> KNOT VECTOR FOR EACH DIRECTION
-      real(SPI_RK), dimension (:), pointer :: opr_knots
-      real(SPI_RK), dimension (:), pointer :: opr_control_points
+      real(SPI_RK), dimension (:), ALLOCATABLE :: opr_knots
   END TYPE DEF_MESH_1D_BSPLINE
   ! .........................................................
 

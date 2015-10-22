@@ -23,13 +23,14 @@ MODULE SPI_BASIS_DEF
      CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
 
      ! ... n_elements, n_points_per_element, n_non_vanishing_functions_per_element
-     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_0
-     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: TestfT_p, TestfT_pp 
+     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: B_0
+     REAL(KIND=SPI_RK), DIMENSION(:,:,:)  , ALLOCATABLE :: B_s1, B_s1s1 
   END TYPE DEF_BASIS_1D
 ! ..........................................................        
 
 ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BASIS_1D) :: DEF_BASIS_1D_BSPLINE
+     integer, dimension (:), ALLOCATABLE :: opi_i_begin
      CLASS(DEF_MESH_1D_BSPLINE), POINTER :: ptr_mesh => NULL()
   END TYPE DEF_BASIS_1D_BSPLINE
 ! ..........................................................        

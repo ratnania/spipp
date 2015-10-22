@@ -9,6 +9,7 @@ MODULE SPI_BLACKBOX_DEF
   TYPE, PUBLIC, ABSTRACT :: DEF_BLACKBOX_ABSTRACT
      INTEGER :: oi_n_points
      INTEGER :: oi_n_elements
+     INTEGER :: n_dim
      INTEGER :: oi_basis_type
 
      ! ...
@@ -26,22 +27,9 @@ MODULE SPI_BLACKBOX_DEF
      ! ...
 
      ! ... Volume and wieghted volume
+     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: Jacobians 
      REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: Vol
      REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE  :: wVol
-     ! ...
-
-     ! ...
-     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE :: B_0
-     ! ...
-
-     ! ... Basis Logical Derivatives
-     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE :: B_s1
-     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE :: B_s1s1
-     ! ...
-
-     ! ... Basis Physical Derivatives
-     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE :: B_x1
-     REAL(KIND=SPI_RK), DIMENSION(:, :), ALLOCATABLE :: B_x1x1
      ! ...
     
      CLASS(DEF_QUADRATURE_1D), POINTER :: ptr_quad => NULL()
@@ -55,9 +43,38 @@ MODULE SPI_BLACKBOX_DEF
 
   ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_1D) :: DEF_BLACKBOX_1D_BSPLINE
+     REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: control_points
+
      CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis => NULL()
      CLASS(DEF_MESH_1D_BSPLINE), POINTER :: ptr_mesh => NULL()
   END TYPE DEF_BLACKBOX_1D_BSPLINE
+  ! ..........................................................        
+
+  ! ..........................................................        
+  TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_ABSTRACT) :: DEF_BLACKBOX_2D_BSPLINE
+     REAL(SPI_RK), DIMENSION (:, :, :), ALLOCATABLE :: control_points
+
+     CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis_u => NULL()
+     CLASS(DEF_MESH_1D_BSPLINE) , POINTER :: ptr_mesh_u  => NULL()
+
+     CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis_v => NULL()
+     CLASS(DEF_MESH_1D_BSPLINE) , POINTER :: ptr_mesh_v  => NULL()
+  END TYPE DEF_BLACKBOX_2D_BSPLINE
+  ! ..........................................................        
+
+  ! ..........................................................        
+  TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_ABSTRACT) :: DEF_BLACKBOX_3D_BSPLINE
+     REAL(SPI_RK), DIMENSION (:, :, :, :), ALLOCATABLE :: control_points
+
+     CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis_u => NULL()
+     CLASS(DEF_MESH_1D_BSPLINE) , POINTER :: ptr_mesh_u  => NULL()
+
+     CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis_v => NULL()
+     CLASS(DEF_MESH_1D_BSPLINE) , POINTER :: ptr_mesh_v  => NULL()
+
+     CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis_w => NULL()
+     CLASS(DEF_MESH_1D_BSPLINE) , POINTER :: ptr_mesh_w  => NULL()
+  END TYPE DEF_BLACKBOX_3D_BSPLINE
   ! ..........................................................        
 
   ! ..........................................................        

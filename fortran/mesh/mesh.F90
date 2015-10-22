@@ -8,7 +8,7 @@ MODULE SPI_MESH
 CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH(self, ao_quad, ai_n, ai_p, ai_type_bc, apr_knots, apr_control_points)
+  SUBROUTINE CREATE_MESH(self, ao_quad, ai_n, ai_p, ai_type_bc, apr_knots)
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD
   IMPLICIT NONE
@@ -18,7 +18,6 @@ CONTAINS
      INTEGER               , INTENT(IN)   :: ai_p
      INTEGER               , OPTIONAL, INTENT(IN)   :: ai_type_bc
      real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
-     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_control_points
      ! LOCAL
      INTEGER :: li_err     
 
@@ -30,8 +29,7 @@ CONTAINS
                 & ai_n, &
                 & ai_p, & 
                 & ai_type_bc=ai_type_bc, &
-                & apr_knots=apr_knots, &
-                & apr_control_points=apr_control_points &
+                & apr_knots=apr_knots &
                 & )
         CALL CREATE_MESH_POINTS_1D(self, ao_quad) 
 
@@ -111,38 +109,6 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D(self, apr_control_points)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-      real(SPI_RK), dimension (:), INTENT(IN):: apr_control_points
-     ! LOCAL
-
-     ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
-
-     ! ... control points
-     self % opr_control_points = apr_control_points 
-  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D(self)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     ! LOCAL
-     INTEGER :: li_i
-
-     ALLOCATE ( self % opr_control_points( self % oi_n ) ) 
-
-     ! ... control points
-     self % opr_control_points = 0.0
-     do li_i = 1, self % oi_n 
-        self % opr_control_points( li_i ) = (li_i - 1) * 1.0 / (self % oi_n - 1)
-     end do 
-     ! ...
-  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
   SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
@@ -210,14 +176,13 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc, apr_knots, apr_control_points)
+  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, ai_type_bc, apr_knots)
   IMPLICIT NONE
      TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
      INTEGER              , INTENT(IN)    :: ai_n
      INTEGER              , INTENT(IN)    :: ai_p
      INTEGER              , OPTIONAL, INTENT(IN)    :: ai_type_bc
      real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_knots
-     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: apr_control_points
      ! LOCAL
      INTEGER :: li_err 
 
@@ -229,12 +194,6 @@ CONTAINS
 
      IF ( ( PRESENT(apr_knots)) ) THEN
         CALL INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, apr_knots) 
-     END IF
-
-     IF ( ( PRESENT(apr_control_points)) ) THEN
-        CALL INITIALIZE_MESH_CONTROL_POINTS_BSPLINES_1D(self, apr_control_points) 
-     ELSE
-        CALL INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_BSPLINES_1D(self) 
      END IF
 
      CALL CREATE_MESH_GRID_BSPLINES_1D(self) 
@@ -297,7 +256,6 @@ CONTAINS
      INTEGER :: li_err 
 
      DEALLOCATE ( self % opr_knots ) 
-     DEALLOCATE ( self % opr_control_points ) 
 
   END SUBROUTINE FREE_MESH_BSPLINES_1D
   ! .........................................................

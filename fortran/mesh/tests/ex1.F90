@@ -46,9 +46,6 @@ implicit none
    PRINT *, ">>> grid"
    PRINT *, lo_mesh % opr_grid
 
-   PRINT *, ">>> control points"
-   PRINT *, lo_mesh % opr_control_points
-
    PRINT *, ">>> points"
    DO e = 1, 4
       PRINT *, lo_mesh % opr_points(e,:)

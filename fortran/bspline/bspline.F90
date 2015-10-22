@@ -757,15 +757,13 @@ subroutine FindMult(p,m,U,uu,span,mult)
   implicit none
   integer(kind=4), intent(in)  :: p, m
   real   (kind=8), intent(in)  :: U(0:m), uu
-  integer(kind=4), intent(in)  :: span
+  integer(kind=4), intent(inout)  :: span
   integer(kind=4), intent(out) :: mult
-  integer(kind=4) :: k
-  if (span >= 0) then
-     k = span
-  else
-     k = FindSpan(m-(p+1),p,uu,U)
+
+  if (span < 0) then
+     span = FindSpan(m-(p+1),p,uu,U)
   end if
-  mult = FindM(k,uu,p,U)
+  mult = FindM(span,uu,p,U)
 end subroutine FindMult
 ! .......................................................
 
@@ -790,16 +788,15 @@ subroutine EvalBasisFuns(p,m,U,uu,span,N)
 !        Output: 
   use bspline
   implicit none
-  integer(kind=4), intent(in) :: p, m, span
+  integer(kind=4), intent(in) :: p, m
+  integer(kind=4), intent(inout) :: span
   real   (kind=8), intent(in) :: U(0:m), uu
   real   (kind=8), intent(out):: N(0:p)
-  integer(kind=4) :: i
-  if (span >= 0) then
-     i = span
-  else
-     i = FindSpan(m-(p+1),p,uu,U)
+
+  if (span < 0) then
+     span = FindSpan(m-(p+1),p,uu,U)
   end if
-  call BasisFuns(i,uu,p,U,N)
+  call BasisFuns(span,uu,p,U,N)
 end subroutine EvalBasisFuns
 ! .......................................................
 
@@ -810,16 +807,15 @@ subroutine EvalBasisFunsDers(p,m,U,uu,d,span,dN)
 !        Output: 
   use bspline
   implicit none
-  integer(kind=4), intent(in) :: p, m, d, span
+  integer(kind=4), intent(in) :: p, m, d
+  integer(kind=4), intent(inout) :: span
   real   (kind=8), intent(in) :: U(0:m), uu
   real   (kind=8), intent(out):: dN(0:p,0:d)
-  integer(kind=4) :: i
-  if (span >= 0) then
-     i = span
-  else
-     i = FindSpan(m-(p+1),p,uu,U)
+
+  if (span < 0) then
+     span = FindSpan(m-(p+1),p,uu,U)
   end if
-  call DersBasisFuns(i,uu,p,d,U,dN)
+  call DersBasisFuns(span,uu,p,d,U,dN)
 end subroutine EvalBasisFunsDers
 ! .......................................................
 
