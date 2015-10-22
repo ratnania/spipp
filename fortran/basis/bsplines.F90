@@ -21,7 +21,7 @@ MODULE SPI_BASIS_BSPLINE
   PRIVATE
   PUBLIC :: CREATE_BASIS_1D_BSPLINE, &
           & RESET_BASIS_1D_BSPLINE,  &
-          & UPDATE_BASIS_1D_BSPLINE, &
+          & EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_BSPLINE, &
           & FREE_BASIS_1D_BSPLINE
 
 CONTAINS
@@ -66,7 +66,7 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS_1D_BSPLINE(self)
+   SUBROUTINE EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_BSPLINE(self)
    IMPLICIT NONE
      CLASS(DEF_BASIS_1D_BSPLINE), INTENT(INOUT) :: self
      ! LOCAL
@@ -84,7 +84,7 @@ CONTAINS
            lr_x = self % ptr_mesh % opr_points(i_element,li_ig)
 !           print *, lr_x
            CALL EVALUATE_BASIS_1D_BSPLINE(self, lr_x, B, B_s, B_ss)
-           print *, lr_x, B
+!           print *, lr_x, B
 
            self % TestfT_0  (i_element, li_ig, :) = B   (:)
            self % TestfT_p  (i_element, li_ig, :) = B_s (:)
@@ -92,7 +92,7 @@ CONTAINS
         END DO
      END DO
 
-   END SUBROUTINE UPDATE_BASIS_1D_BSPLINE
+   END SUBROUTINE EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_BSPLINE
    ! ...................................................
 
    ! ...................................................

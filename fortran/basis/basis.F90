@@ -114,7 +114,7 @@ CONTAINS
    ! ...................................................
 
    ! ...................................................
-   SUBROUTINE UPDATE_BASIS(self)
+   SUBROUTINE EVALUATE_BASIS_ON_QUADRATURE_POINTS(self)
    IMPLICIT NONE
      CLASS(DEF_BASIS_ABSTRACT), INTENT(INOUT) :: self
      ! LOCAL
@@ -124,25 +124,25 @@ CONTAINS
 
      ! ...
      CLASS IS (DEF_BASIS_1D_BSPLINE)
-        CALL UPDATE_BASIS_1D_BSPLINE(self)
+        CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_BSPLINE(self)
      ! ...
 
 !     ! ...
 !     CLASS IS (DEF_BASIS_1D_FOURIER)
-!        CALL UPDATE_BASIS_1D_FOURIER(self, apr_points)
+!        CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_FOURIER(self, apr_points)
 !     ! ...
 !
 !     ! ...
 !     CLASS IS (DEF_BASIS_1D_HBEZIER)
-!        CALL UPDATE_BASIS_1D_HBEZIER(self, apr_points)
+!        CALL EVALUATE_BASIS_ON_QUADRATURE_POINTS_1D_HBEZIER(self, apr_points)
 !     ! ...
 
      CLASS DEFAULT
-        STOP 'UPDATE_BASIS: unexpected type for self object!'
+        STOP 'EVALUATE_BASIS_ON_QUADRATURE_POINTS: unexpected type for self object!'
      END SELECT
      ! ...
 
-   END SUBROUTINE UPDATE_BASIS
+   END SUBROUTINE EVALUATE_BASIS_ON_QUADRATURE_POINTS
    ! ...................................................
 
 END MODULE SPI_BASIS
