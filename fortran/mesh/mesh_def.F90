@@ -20,7 +20,6 @@ MODULE SPI_MESH_DEF
 
   ! .........................................................
   TYPE, ABSTRACT, PUBLIC :: DEF_MESH_ABSTRACT
-     INTEGER :: oi_n_dim    
      INTEGER :: n_elements
      INTEGER :: oi_n_vtex_per_elmt
 
@@ -53,11 +52,13 @@ MODULE SPI_MESH_DEF
 
   ! .........................................................
   TYPE, PUBLIC, EXTENDS(DEF_MESH_1D) :: DEF_MESH_1D_BSPLINE
-      integer		:: oi_n 
-      integer		:: oi_p	
+     integer :: oi_n 
+     integer :: oi_p
+     INTEGER :: n_dim
 
-      !> KNOT VECTOR FOR EACH DIRECTION
-      real(SPI_RK), dimension (:), ALLOCATABLE :: opr_knots
+     !> KNOT VECTOR FOR EACH DIRECTION
+     real(SPI_RK), dimension (:), ALLOCATABLE :: opr_knots
+     REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: control_points
   END TYPE DEF_MESH_1D_BSPLINE
   ! .........................................................
 

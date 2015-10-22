@@ -31,8 +31,8 @@ implicit none
 !   INTEGER, PARAMETER :: P =  1 
 !   INTEGER, PARAMETER :: P =  2 
    INTEGER, PARAMETER :: P =  3 
-!   INTEGER, PARAMETER :: N = P + 1 + 127 
-   INTEGER, PARAMETER :: N = P + 1 + 1027 
+   INTEGER, PARAMETER :: N = P + 1 + 127 
+!   INTEGER, PARAMETER :: N = P + 1 + 1027 
    REAL(SPI_RK), DIMENSION(N+P+1) :: KNOTS
    INTEGER, PARAMETER :: n_iterations = 10 
    INTEGER :: i_iteration

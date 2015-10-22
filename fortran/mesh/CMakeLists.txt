@@ -1,11 +1,13 @@
 ##########################################################################
 set(files 
 	${SPIPP_MESH_DIR}/mesh_def.F90
+	${SPIPP_MESH_DIR}/mesh_bspline.F90
 	${SPIPP_MESH_DIR}/mesh_transform.F90 
 	${SPIPP_MESH_DIR}/mesh.F90 )
 
 set(mods 
           ${CMAKE_BINARY_DIR}/modules/spi_mesh_def.mod
+          ${CMAKE_BINARY_DIR}/modules/spi_mesh_bspline.mod
 	  ${CMAKE_BINARY_DIR}/modules/spi_mesh_transform.mod
           ${CMAKE_BINARY_DIR}/modules/spi_mesh.mod)
 

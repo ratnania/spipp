@@ -59,19 +59,11 @@ implicit none
    ! ...
 
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
-   CALL CREATE_MESH(lo_mesh, lo_quad, N, P, apr_knots=KNOTS) 
+   CALL CREATE_MESH(lo_mesh, lo_quad, N, P &
+           & , apr_knots=KNOTS &
+           & , control_points_1d=control_points_1d) 
    CALL CREATE_BASIS(lo_basis, lo_mesh, lo_quad) 
-   CALL CREATE_BLACKBOX(lo_bbox, lo_mesh, lo_basis, lo_quad, control_points_1d=control_points_1d)
-
-   ! ...
-   call cpu_time(start)
-   DO i_iteration=1, n_iterations
-     CALL UPDATE_POSITION_BLACKBOX(lo_bbox)
-     CALL COMPUTE_METRIC_BLACKBOX(lo_bbox) 
-   END DO
-   call cpu_time(finish)
-   print '("Time to evaluate positions and jacobians on quadrature = ",f6.3," seconds.")',(finish-start)/n_iterations
-   ! ...
+   CALL CREATE_BLACKBOX(lo_bbox, lo_mesh, lo_basis, lo_quad)
 
    CALL FREE_QUADRATURE(lo_quad) 
    CALL FREE_MESH(lo_mesh) 

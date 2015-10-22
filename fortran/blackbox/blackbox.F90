@@ -11,13 +11,12 @@ MODULE SPI_BLACKBOX
     CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_BLACKBOX(self, ao_mesh, ao_basis, ao_quad, control_points_1d)
+  SUBROUTINE CREATE_BLACKBOX(self, ao_mesh, ao_basis, ao_quad)
   IMPLICIT NONE
     CLASS(DEF_BLACKBOX_ABSTRACT), INTENT(INOUT) :: self
     CLASS(DEF_MESH_ABSTRACT)    , TARGET        :: ao_mesh
     CLASS(DEF_BASIS_ABSTRACT)   , TARGET        :: ao_basis
     CLASS(DEF_QUADRATURE_1D)    , TARGET        :: ao_quad
-    real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points_1d
     ! LOCAL
     INTEGER, PARAMETER :: N_DIM=1
     INTEGER :: li_err
@@ -33,7 +32,7 @@ MODULE SPI_BLACKBOX
        CLASS IS (DEF_BASIS_1D_BSPLINE)
          SELECT TYPE (ao_mesh)
          CLASS IS (DEF_MESH_1D_BSPLINE)
-            CALL CREATE_BLACKBOX_1D_BSPLINE(self, ao_mesh, ao_basis, control_points_1d=control_points_1d)
+            CALL CREATE_BLACKBOX_1D_BSPLINE(self, ao_mesh, ao_basis)
          CLASS DEFAULT
             STOP 'CREATE_BLACKBOX: unexpected type for ao_mesh object!'
          END SELECT
@@ -41,35 +40,13 @@ MODULE SPI_BLACKBOX
           STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
        END SELECT
 
-!    CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
-!       SELECT TYPE (ao_basis)
-!       CLASS IS (DEF_BASIS_1D_HBEZIER)
-!         SELECT TYPE (ao_mesh)
-!         CLASS IS (DEF_MESH_1D_HBEZIER)
-!            CALL CREATE_BLACKBOX_1D_HBEZIER(self, ao_mesh, ao_basis)
-!         CLASS DEFAULT
-!            STOP 'CREATE_BLACKBOX: unexpected type for ao_mesh object!'
-!         END SELECT
-!       CLASS DEFAULT
-!          STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
-!       END SELECT
-!
-!    CLASS IS (DEF_BLACKBOX_1D_FOURIER)
-!       SELECT TYPE (ao_basis)
-!       CLASS IS (DEF_BASIS_1D_FOURIER)
-!         SELECT TYPE (ao_mesh)
-!         CLASS IS (DEF_MESH_1D_FOURIER)
-!            CALL CREATE_BLACKBOX_1D_FOURIER(self, ao_mesh, ao_basis)
-!         CLASS DEFAULT
-!            STOP 'CREATE_BLACKBOX: unexpected type for ao_mesh object!'
-!         END SELECT
-!       CLASS DEFAULT
-!          STOP 'CREATE_BLACKBOX: unexpected type for ao_basis object!'
-!       END SELECT
     CLASS DEFAULT
        STOP 'CREATE_BLACKBOX: unexpected type for self object!'
     END SELECT
     ! ...
+
+    CALL UPDATE_POSITION_BLACKBOX(self)
+    CALL COMPUTE_METRIC_BLACKBOX(self) 
 
   END SUBROUTINE CREATE_BLACKBOX
   ! .........................................................
@@ -165,34 +142,12 @@ MODULE SPI_BLACKBOX
      SELECT TYPE (self)
      CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
         CALL COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(self)
-!     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
-!        CALL COMPUTE_METRIC_BLACKBOX_1D_HBEZIER(self)
-!     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
-!           CALL COMPUTE_METRIC_BLACKBOX_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'COMPUTE_METRIC_BLACKBOX: unexpected type for self object!'
      END SELECT
      ! ...
 
   END SUBROUTINE COMPUTE_METRIC_BLACKBOX 
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE UPDATE_PHYSICAL_BASIS_BLACKBOX(self)
-   IMPLICIT NONE
-    CLASS(DEF_BLACKBOX_ABSTRACT), INTENT(INOUT) :: self
-
-!    self % B_x1   = self % B_s1   /  self % Vol
-!    self % B_x1x1 = self % B_s1s1 / (self % Vol**2)
-
-  END SUBROUTINE UPDATE_PHYSICAL_BASIS_BLACKBOX 
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE BLACKBOX_UPDATE_POSITION()
-   IMPLICIT NONE
-
-  END SUBROUTINE BLACKBOX_UPDATE_POSITION 
   ! .........................................................
 
   ! .........................................................
@@ -205,10 +160,6 @@ MODULE SPI_BLACKBOX
      SELECT TYPE (self)
      CLASS IS (DEF_BLACKBOX_1D_BSPLINE)
         CALL UPDATE_POSITION_BLACKBOX_1D_BSPLINE(self)
-!     CLASS IS (DEF_BLACKBOX_1D_HBEZIER)
-!        CALL UPDATE_POSITION_BLACKBOX_1D_HBEZIER(self)
-!     CLASS IS (DEF_BLACKBOX_1D_FOURIER)
-!        CALL UPDATE_POSITION_BLACKBOX_1D_FOURIER(self)
      CLASS DEFAULT
         STOP 'UPDATE_POSITION_BLACKBOX: unexpected type for self object!'
      END SELECT

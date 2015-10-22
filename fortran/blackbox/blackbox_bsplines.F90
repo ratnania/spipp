@@ -8,64 +8,19 @@ MODULE SPI_BLACKBOX_BSPLINE
     CONTAINS
 
   ! ........................................................
-  SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE(self, ao_mesh, ao_basis, control_points_1d)
+  SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE(self, ao_mesh, ao_basis)
   implicit none
      type(DEF_BLACKBOX_1D_BSPLINE)        , INTENT(INOUT) :: self
      TYPE(DEF_MESH_1D_BSPLINE)   , TARGET, INTENT(IN)    :: ao_mesh
      TYPE(DEF_BASIS_1D_BSPLINE)   , TARGET, INTENT(IN)    :: ao_basis
-     real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points_1d
      ! LOCAL VARIABLES
      integer  :: li_ref
 
      self % ptr_basis => ao_basis
      self % ptr_mesh => ao_mesh
 
-     IF ( ( PRESENT(control_points_1d)) ) THEN
-        CALL INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS(self, control_points_1d) 
-     ELSE
-        CALL INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self) 
-     END IF
   END SUBROUTINE CREATE_BLACKBOX_1D_BSPLINE
   ! ........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS(self, control_points_1d)
-  IMPLICIT NONE
-     TYPE(DEF_BLACKBOX_1D_BSPLINE)      , INTENT(INOUT) :: self
-      real(SPI_RK), dimension (:,:), INTENT(IN):: control_points_1d
-     ! LOCAL
-     INTEGER :: n_dim 
-
-     n_dim =  SIZE(control_points_1d, 2) 
-     self % n_dim = n_dim
-
-     ALLOCATE ( self % control_points( self % ptr_mesh % oi_n, n_dim ) ) 
-
-     ! ... control points
-     self % control_points = control_points_1d 
-  END SUBROUTINE INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self)
-  IMPLICIT NONE
-     TYPE(DEF_BLACKBOX_1D_BSPLINE)      , INTENT(INOUT) :: self
-     ! LOCAL
-     INTEGER :: li_i
-     INTEGER :: n_dim 
-
-     n_dim = 1 
-     self % n_dim = n_dim
-     ALLOCATE ( self % control_points( self % ptr_mesh % oi_n, n_dim ) ) 
-
-     ! ... control points
-     self % control_points = 0.0
-     do li_i = 1, self % ptr_mesh % oi_n 
-        self % control_points( li_i, 1 ) = (li_i - 1) * 1.0d0 / (self % ptr_mesh % oi_n - 1)
-     end do 
-     ! ...
-  END SUBROUTINE INITIALIZE_BLACKBOX_1D_BSPLINE_CONTROL_POINTS_DEFAULT
-  ! .........................................................
 
   ! ........................................................
   SUBROUTINE COMPUTE_METRIC_BLACKBOX_1D_BSPLINE(self)
@@ -122,13 +77,13 @@ MODULE SPI_BLACKBOX_BSPLINE
               i_ctrl_pt = i_basis + self % ptr_basis % opi_i_begin(i_element) - self % ptr_mesh % oi_p 
 
               self % Xp_0(i_element, i_point, :) = self % Xp_0(i_element, i_point, :) &
-                      & + self % ptr_basis % B_0(i_element, i_point, i_basis) * self % control_points(i_ctrl_pt, :)
+                      & + self % ptr_basis % B_0(i_element, i_point, i_basis) * self % ptr_mesh % control_points(i_ctrl_pt, :)
 
               self % Xp_s1(i_element, i_point, :) = self % Xp_s1(i_element, i_point, :) &
-                      & + self % ptr_basis % B_s1(i_element, i_point, i_basis) * self % control_points(i_ctrl_pt, :)
+                      & + self % ptr_basis % B_s1(i_element, i_point, i_basis) * self % ptr_mesh %control_points(i_ctrl_pt, :)
 
               self % Xp_s1s1(i_element, i_point, :) = self % Xp_s1s1(i_element, i_point, :) &
-                      & + self % ptr_basis % B_s1s1(i_element, i_point, i_basis) * self % control_points(i_ctrl_pt, :)
+                      & + self % ptr_basis % B_s1s1(i_element, i_point, i_basis) * self % ptr_mesh %control_points(i_ctrl_pt, :)
            END DO
         END DO
      END DO

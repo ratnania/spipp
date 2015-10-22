@@ -43,8 +43,6 @@ MODULE SPI_BLACKBOX_DEF
 
   ! ..........................................................        
   TYPE, PUBLIC, EXTENDS(DEF_BLACKBOX_1D) :: DEF_BLACKBOX_1D_BSPLINE
-     REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: control_points
-
      CLASS(DEF_BASIS_1D_BSPLINE), POINTER :: ptr_basis => NULL()
      CLASS(DEF_MESH_1D_BSPLINE), POINTER :: ptr_mesh => NULL()
   END TYPE DEF_BLACKBOX_1D_BSPLINE
