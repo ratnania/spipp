@@ -84,6 +84,7 @@ SET(SPIPP_BSPLINE_DIR       ${PROJECT_SOURCE_DIR}/fortran/bspline)
 SET(SPIPP_BASIS_DIR         ${PROJECT_SOURCE_DIR}/fortran/basis)
 SET(SPIPP_BLACKBOX_DIR      ${PROJECT_SOURCE_DIR}/fortran/blackbox)
 SET(SPIPP_MESH_DIR          ${PROJECT_SOURCE_DIR}/fortran/mesh)
+SET(SPIPP_MESH_LOGICAL_DIR  ${PROJECT_SOURCE_DIR}/fortran/mesh_logical)
 
 enable_language (Fortran)
 

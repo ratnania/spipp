@@ -17,22 +17,29 @@ ENDIF(BUILD_TESTS)
 ##########################################################################
 
 ##########################################################################
-add_subdirectory(basis)
+add_subdirectory(mesh_logical)
 IF(BUILD_TESTS)
-   add_subdirectory(basis/tests)
+   add_subdirectory(mesh_logical/tests)
 ENDIF(BUILD_TESTS)
 ##########################################################################
 
-##########################################################################
-add_subdirectory(mesh)
-IF(BUILD_TESTS)
-   add_subdirectory(mesh/tests)
-ENDIF(BUILD_TESTS)
-##########################################################################
+###########################################################################
+#add_subdirectory(basis)
+#IF(BUILD_TESTS)
+#   add_subdirectory(basis/tests)
+#ENDIF(BUILD_TESTS)
+###########################################################################
 
-##########################################################################
-add_subdirectory(blackbox)
-IF(BUILD_TESTS)
-   add_subdirectory(blackbox/tests)
-ENDIF(BUILD_TESTS)
-##########################################################################
+###########################################################################
+#add_subdirectory(mesh)
+#IF(BUILD_TESTS)
+#   add_subdirectory(mesh/tests)
+#ENDIF(BUILD_TESTS)
+###########################################################################
+#
+###########################################################################
+#add_subdirectory(blackbox)
+#IF(BUILD_TESTS)
+#   add_subdirectory(blackbox/tests)
+#ENDIF(BUILD_TESTS)
+###########################################################################

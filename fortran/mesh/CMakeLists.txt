@@ -12,6 +12,6 @@ set(mods
           ${CMAKE_BINARY_DIR}/modules/spi_mesh.mod)
 
 add_library(spi_mesh ${files})
-target_link_libraries(spi_mesh spi_global)
+target_link_libraries(spi_mesh spi_mesh_logical spi_global)
 install(TARGETS spi_mesh DESTINATION lib)
 ##########################################################################

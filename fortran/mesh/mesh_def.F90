@@ -1,54 +1,76 @@
 !# -*- coding: utf8 -*-
 MODULE SPI_MESH_DEF
   USE SPI_GLOBAL_DEF
-  USE SPI_QUADRATURES_DEF
+  USE SPI_MESH_LOGICAL_DEF
   IMPLICIT NONE
 
   ! .........................................................
-!  TYPE, PUBLIC :: DEF_ELEMENT
-!     INTEGER :: oi_nen
-!     REAL(KIND=SPI_RK) , DIMENSION(:),   ALLOCATABLE :: opr_knots 
-!
-!     INTEGER :: oi_n_vtex
-!     INTEGER :: oi_n_bnet
-!     INTEGER :: oi_n_order
-!     INTEGER :: oi_loc_id   ! local number to the current patch
-!
-!     INTEGER, DIMENSION(:), ALLOCATABLE    :: opi_LocToGlob  
-!  END TYPE DEF_ELEMENT
+  TYPE, ABSTRACT, PUBLIC :: DEF_MESH_CONTROL_POINTS_ABSTRACT
+  END TYPE DEF_MESH_CONTROL_POINTS_ABSTRACT
   ! .........................................................
 
   ! .........................................................
-  TYPE, ABSTRACT, PUBLIC :: DEF_MESH_ABSTRACT
-     INTEGER :: n_elements
-  END TYPE DEF_MESH_ABSTRACT
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_CONTROL_POINTS_ABSTRACT) :: DEF_MESH_CONTROL_POINTS_1D
+     REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: coef
+  END TYPE DEF_MESH_CONTROL_POINTS_1D
   ! .........................................................
 
   ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D_BSPLINE
-     INTEGER :: type_bc
-
-     integer :: n 
-     integer :: p
-     INTEGER :: n_dim
-
-     REAL(SPI_RK), dimension (:), allocatable :: opr_grid
-     REAL(SPI_RK), dimension (:,:), allocatable :: opr_points
-     CLASS(DEF_QUADRATURE_ABSTRACT), POINTER :: ptr_quad => NULL()
-
-     !> KNOT VECTOR FOR EACH DIRECTION
-     real(SPI_RK), dimension (:), ALLOCATABLE :: knots
-     REAL(SPI_RK), DIMENSION (:,:), ALLOCATABLE :: control_points
-  END TYPE DEF_MESH_1D_BSPLINE
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_CONTROL_POINTS_ABSTRACT) :: DEF_MESH_CONTROL_POINTS_2D
+     REAL(SPI_RK), DIMENSION (:,:,:), ALLOCATABLE :: coef
+  END TYPE DEF_MESH_CONTROL_POINTS_2D
   ! .........................................................
 
   ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_2D_BSPLINE
-     TYPE(DEF_MESH_1D_BSPLINE) :: mesh_u
-     TYPE(DEF_MESH_1D_BSPLINE) :: mesh_v
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_CONTROL_POINTS_ABSTRACT) :: DEF_MESH_CONTROL_POINTS_3D
+     REAL(SPI_RK), DIMENSION (:,:,:,:), ALLOCATABLE :: coef
+  END TYPE DEF_MESH_CONTROL_POINTS_3D
+  ! .........................................................
 
-     REAL(SPI_RK), DIMENSION (:,:,:), ALLOCATABLE :: control_points
-  END TYPE DEF_MESH_2D_BSPLINE
+  ! .........................................................
+  TYPE, ABSTRACT, PUBLIC :: DEF_MESH_BSPLINE_ABSTRACT
+     INTEGER :: n_elements = 0
+     INTEGER :: n_dim      = 0 
+     INTEGER :: d_dim      = 0
+     INTEGER :: c_dim      = 0
+
+     TYPE(DEF_MESH_LOGICAL_BSPLINE), DIMENSION(:), POINTER :: logicals
+  END TYPE DEF_MESH_BSPLINE_ABSTRACT
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_BSPLINE_ABSTRACT) :: DEF_MESH_BSPLINE_1D
+     ! c_dim= 1 
+     TYPE(DEF_MESH_CONTROL_POINTS_1D), DIMENSION(:), ALLOCATABLE :: control_points 
+  END TYPE DEF_MESH_BSPLINE_1D
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_BSPLINE_ABSTRACT) :: DEF_MESH_BSPLINE_2D
+     ! c_dim= 1 
+     TYPE(DEF_MESH_CONTROL_POINTS_2D), DIMENSION(:), ALLOCATABLE :: control_points
+  END TYPE DEF_MESH_BSPLINE_2D
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_BSPLINE_ABSTRACT) :: DEF_MESH_BSPLINE_3D
+     ! c_dim= 1 
+     TYPE(DEF_MESH_CONTROL_POINTS_3D), DIMENSION(:), ALLOCATABLE :: control_points
+  END TYPE DEF_MESH_BSPLINE_3D
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_BSPLINE_ABSTRACT) :: DEF_MESH_BSPLINE_1D1D
+     ! c_dim= 2 
+     TYPE(DEF_MESH_CONTROL_POINTS_1D), DIMENSION(:), ALLOCATABLE :: control_points 
+  END TYPE DEF_MESH_BSPLINE_1D1D
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_BSPLINE_ABSTRACT) :: DEF_MESH_1D1D1D_BSPLINE
+     ! c_dim= 3 
+     TYPE(DEF_MESH_CONTROL_POINTS_1D), DIMENSION(:), ALLOCATABLE :: control_points 
+  END TYPE DEF_MESH_1D1D1D_BSPLINE
   ! .........................................................
 
 END MODULE SPI_MESH_DEF

@@ -8,145 +8,291 @@ MODULE SPI_MESH_BSPLINE
 CONTAINS
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH_GRID_BSPLINES_1D(self)
+  SUBROUTINE CREATE_MESH_BSPLINE(   self              &
+                                & , d_dim             &
+                                & , logical_mesh_s1   &
+                                & , logical_mesh_s2   &
+                                & , logical_mesh_s3   &
+                                &  )
   IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     CLASS(DEF_MESH_BSPLINE_ABSTRACT)                , INTENT(INOUT) :: self
+     INTEGER                               , OPTIONAL, INTENT(IN)    :: d_dim
+     TYPE(DEF_MESH_LOGICAL_BSPLINE), TARGET, OPTIONAL, INTENT(IN)    :: logical_mesh_s1 
+     TYPE(DEF_MESH_LOGICAL_BSPLINE), TARGET, OPTIONAL, INTENT(IN)    :: logical_mesh_s2
+     TYPE(DEF_MESH_LOGICAL_BSPLINE), TARGET, OPTIONAL, INTENT(IN)    :: logical_mesh_s3
      ! LOCAL
-     INTEGER :: n_elements
+     INTEGER :: n_dim
+
+     ! ... Manifold dimension
+     self % d_dim = 1
+     IF ( ( PRESENT(d_dim)) ) THEN
+        self % d_dim = d_dim 
+     END IF
+     ! ...
+
+     ! ... parametric dimension
+     n_dim = 0
+     IF ( ( PRESENT(logical_mesh_s1)) ) THEN
+        n_dim = n_dim + 1
+     END IF
+     IF ( ( PRESENT(logical_mesh_s2)) ) THEN
+        n_dim = n_dim + 1
+     END IF
+     IF ( ( PRESENT(logical_mesh_s3)) ) THEN
+        n_dim = n_dim + 1
+     END IF
+     self % n_dim = n_dim
+     ! ...
+
+     ! ... allocate the array of logical meshes and set the pointers
+     ALLOCATE(self % logicals(n_dim))
+
+     IF ( ( PRESENT(logical_mesh_s1)) ) THEN
+        self % logicals(1) => logical_mesh_s1
+     END IF
+     IF ( ( PRESENT(logical_mesh_s2)) ) THEN
+        self % logicals(2) => logical_mesh_s2
+     END IF
+     IF ( ( PRESENT(logical_mesh_s3)) ) THEN
+        self % logicals(3) => logical_mesh_s3
+     END IF
+     ! ...
+
+  END SUBROUTINE CREATE_MESH_BSPLINE
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE FREE_MESH_BSPLINE(self)
+  IMPLICIT NONE
+     CLASS(DEF_MESH_BSPLINE_ABSTRACT)      , INTENT(INOUT) :: self
+     ! LOCAL
+
+     DEALLOCATE(self % logicals)
+
+  END SUBROUTINE FREE_MESH_BSPLINE
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_BSPLINE_1D(self)
+  IMPLICIT NONE
+     CLASS(DEF_MESH_BSPLINE_1D), INTENT(INOUT) :: self
+     ! LOCAL
+
+     self % c_dim = 1
+
+     ALLOCATE(self % control_points(self % c_dim))
+     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % n, self % d_dim))
+
+  END SUBROUTINE CREATE_MESH_BSPLINE_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_BSPLINE_2D(self)
+  IMPLICIT NONE
+     CLASS(DEF_MESH_BSPLINE_2D), INTENT(INOUT) :: self
+     ! LOCAL
+
+     self % c_dim = 1
+
+     ALLOCATE(self % control_points(self % c_dim))
+     ALLOCATE(self % control_points(1) % coef( &
+                             &   self % logicals(1) % n &
+                             & , self % logicals(2) % n &
+                             & , self % d_dim)) 
+
+  END SUBROUTINE CREATE_MESH_BSPLINE_2D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_BSPLINE_3D(self)
+  IMPLICIT NONE
+     CLASS(DEF_MESH_BSPLINE_3D), INTENT(INOUT) :: self
+     ! LOCAL
+
+     self % c_dim = 1
+
+     ALLOCATE(self % control_points(self % c_dim))
+     ALLOCATE(self % control_points(1) % coef( &
+                             &   self % logicals(1) % n &
+                             & , self % logicals(2) % n &
+                             & , self % logicals(3) % n &
+                             & , self % d_dim)) 
+
+  END SUBROUTINE CREATE_MESH_BSPLINE_3D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE CREATE_MESH_BSPLINE_1D1D(self)
+  IMPLICIT NONE
+     CLASS(DEF_MESH_BSPLINE_1D1D), INTENT(INOUT) :: self
+     ! LOCAL
+
+     self % c_dim = 2 
+
+     ALLOCATE(self % control_points(self % c_dim))
+     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % n, self % d_dim))
+     ALLOCATE(self % control_points(2) % coef(self % logicals(2) % n, self % d_dim))
+
+  END SUBROUTINE CREATE_MESH_BSPLINE_1D1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_1D(self, control_points, i_dimension)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_BSPLINE_1D)     , INTENT(INOUT) :: self
+      REAL(SPI_RK), DIMENSION (:,:), INTENT(IN)    :: control_points
+      INTEGER            , OPTIONAL, INTENT(IN)    :: i_dimension 
+     ! LOCAL
      INTEGER :: i
-     INTEGER :: i_current
-     REAL(SPI_RK), DIMENSION(self % n + self % p + 1) :: lpr_grid
-     REAL(SPI_RK) :: min_current
 
-     lpr_grid = SPI_INT_DEFAULT * 1.0 
-
-     i_current = 1
-     lpr_grid(i_current) = MINVAL(self % knots)
-     DO i=1, self % n + self % p
-        min_current = MINVAL(self % knots(i : self % n + self % p + 1))
-        IF ( min_current > lpr_grid(i_current) ) THEN
-                i_current = i_current + 1
-                lpr_grid(i_current) = min_current
-        END IF
-     END DO
-     n_elements = i_current - 1 
-     self % n_elements = n_elements
-
-     ALLOCATE ( self % opr_grid( n_elements + 1 ) ) 
-     self % opr_grid (1:n_elements+1) = lpr_grid(1:n_elements+1)
-
-  END SUBROUTINE CREATE_MESH_GRID_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, knots)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     INTEGER, INTENT(IN)    :: ai_n
-     INTEGER, INTENT(IN)    :: ai_p
-      real(SPI_RK), dimension (:), INTENT(IN):: knots
-     ! LOCAL
-
-     self % n = ai_n
-     self % p = ai_p
-
-     ALLOCATE ( self % knots( ai_n + ai_p + 1 ) ) 
-     self % knots = knots
-
-  END SUBROUTINE INITIALIZE_MESH_KNOTS_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, type_bc)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     INTEGER, INTENT(IN)    :: ai_n
-     INTEGER, INTENT(IN)    :: ai_p
-     INTEGER, INTENT(IN)    :: type_bc
-     ! LOCAL
-     INTEGER :: li_err 
-     integer  :: li_i
-     integer  :: li_nu ! number of continuity condition for periodic vector knot		
-     real(SPI_RK), dimension ( ai_n + ai_p + 1 ) :: lpr_knot
-
-     self % type_bc = type_bc
-     self % p       = ai_p
-     self % n       = ai_n
-     
-     if ( type_bc == SPI_BC_PERIODIC ) then
-        self % n =  self % n + self % p - 1
-     end if
-                                     
-     self % n_elements = self % n - ai_p
-     
-     ALLOCATE ( self % knots ( self % n + ai_p + 1 ) ) 
-     
-     ! INITIALIZING VECTOR KNOTS
-     if ( self % n < self % p + 1 ) then
-        STOP "Error INIT_MESH_1D_BSPLINE: you must have N >= p + 1"
-     end if
-     
-     ! ... knots
-     self % knots ( 1 : self % p + 1 ) = 0.0
-     do li_i = 1, self % n - self % p - 1
-        self % knots ( self % p + 1 + li_i ) = li_i * 1.0 / ( self % n - self % p )
-     end do 
-     self % knots ( self % n + 1 : self % n + self % p + 1 ) = 1.0
-                                     
-     if ( type_bc == SPI_BC_PERIODIC ) then
-        li_nu = self % p
-        
-        lpr_knot ( : ) = self % knots ( : )
-        call convert_to_periodic_knots ( lpr_Knot ( : ), self % n, self % p, li_nu, self % knots ( : ) )
-     end if
-     ! ...
-
-  END SUBROUTINE INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS(self, control_points_1d)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-      real(SPI_RK), dimension (:,:), INTENT(IN):: control_points_1d
-     ! LOCAL
-     INTEGER :: n_dim 
-
-     n_dim =  SIZE(control_points_1d, 2) 
-     self % n_dim = n_dim
-
-     ALLOCATE ( self % control_points( self % n, n_dim ) ) 
+     i = 1
+     IF (PRESENT(i_dimension)) THEN
+        i = i_dimension
+     END IF
 
      ! ... control points
-     self % control_points = control_points_1d 
-  END SUBROUTINE INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS
+     self % control_points (i) % coef(:,:) = control_points(:,:) 
+  END SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_1D
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self)
+  SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_2D(self, control_points, i_dimension)
   IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     TYPE(DEF_MESH_BSPLINE_2D)       , INTENT(INOUT) :: self
+      REAL(SPI_RK), DIMENSION (:,:,:), INTENT(IN)    :: control_points
+      INTEGER              , OPTIONAL, INTENT(IN)    :: i_dimension 
      ! LOCAL
-     INTEGER :: li_i
-     INTEGER :: n_dim 
+     INTEGER :: i
 
-     n_dim = 1 
-     self % n_dim = n_dim
-     ALLOCATE ( self % control_points( self % n, n_dim ) ) 
+     i = 1
+     IF (PRESENT(i_dimension)) THEN
+        i = i_dimension
+     END IF
 
      ! ... control points
-     self % control_points = 0.0
-     do li_i = 1, self % n 
-        self % control_points( li_i, 1 ) = (li_i - 1) * 1.0d0 / (self % n - 1)
+     self % control_points (i) % coef(:,:,:) = control_points(:,:,:) 
+  END SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_2D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_3D(self, control_points, i_dimension)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_BSPLINE_3D)         , INTENT(INOUT) :: self
+      REAL(SPI_RK), DIMENSION (:,:,:,:), INTENT(IN)    :: control_points
+      INTEGER                , OPTIONAL, INTENT(IN)    :: i_dimension 
+     ! LOCAL
+     INTEGER :: i
+
+     i = 1
+     IF (PRESENT(i_dimension)) THEN
+        i = i_dimension
+     END IF
+
+     ! ... control points
+     self % control_points (i) % coef(:,:,:,:) = control_points(:,:,:,:) 
+  END SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_3D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_1D1D(self, control_points, i_dimension)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_BSPLINE_1D1D)   , INTENT(INOUT) :: self
+      REAL(SPI_RK), DIMENSION (:,:), INTENT(IN)    :: control_points
+      INTEGER                      , INTENT(IN)    :: i_dimension 
+     ! LOCAL
+
+     ! ... control points
+     CALL  SET_MESH_BSPLINE_CONTROL_POINTS_1D(self, control_points, i_dimension=i_dimension)
+  END SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_1D1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_1D(self)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_CONTROL_POINTS_1D), INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: i
+     INTEGER :: n_u
+     INTEGER :: n_total
+
+     n_u = SIZE(self % coef, 1)
+
+     n_total = (n_u - 1) 
+
+     ! ... control points
+     self % coef = 0.0
+     do i = 1, n_u 
+        self % coef ( i, : ) = (i - 1) * 1.0d0 / n_total
      end do 
      ! ...
-  END SUBROUTINE INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT
+  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_1D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_2D(self)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_CONTROL_POINTS_2D), INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: i
+     INTEGER :: j 
+     INTEGER :: n_u
+     INTEGER :: n_v
+     INTEGER :: n_total
+
+     n_u = SIZE(self % coef, 1)
+     n_v = SIZE(self % coef, 2)
+
+     n_total = (n_u - 1) * (n_v - 1) 
+
+     ! ... control points
+     self % coef = 0.0
+     do i = 1, n_u 
+        do j = 1, n_v 
+           self % coef ( i, j, : ) = (i - 1) * (j - 1) * 1.0d0 / n_total
+        end do
+     end do 
+     ! ...
+
+  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_2D
+  ! .........................................................
+
+  ! .........................................................
+  SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_3D(self)
+  IMPLICIT NONE
+     TYPE(DEF_MESH_CONTROL_POINTS_3D), INTENT(INOUT) :: self
+     ! LOCAL
+     INTEGER :: i
+     INTEGER :: j 
+     INTEGER :: k 
+     INTEGER :: n_u
+     INTEGER :: n_v
+     INTEGER :: n_w
+     INTEGER :: n_total
+
+     n_u = SIZE(self % coef, 1)
+     n_v = SIZE(self % coef, 2)
+     n_w = SIZE(self % coef, 3)
+
+     n_total = (n_u - 1) * (n_v - 1) * (n_w - 1)
+
+     ! ... control points
+     self % coef = 0.0
+     do i = 1, n_u 
+        do j = 1, n_v 
+           do k = 1, n_w 
+              self % coef ( i, j, k, : ) = (i - 1) * (j - 1) * (k - 1) * 1.0d0 / n_total
+           end do
+        end do
+     end do 
+     ! ...
+
+  END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_3D
   ! .........................................................
 
   ! .........................................................
   SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, type_bc, knots, control_points)
   IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
+     TYPE(DEF_MESH_BSPLINE_1D)      , INTENT(INOUT) :: self
      INTEGER              , INTENT(IN)    :: ai_n
      INTEGER              , INTENT(IN)    :: ai_p
      INTEGER              , OPTIONAL, INTENT(IN)    :: type_bc
@@ -155,79 +301,14 @@ CONTAINS
      ! LOCAL
      INTEGER :: li_err 
 
-     IF ( (.NOT. PRESENT(knots)) &
-            & .AND. (PRESENT(type_bc)) &
-            & ) THEN
-        CALL INITIALIZE_MESH_KNOTS_DEFAULT_BSPLINES_1D(self, ai_n, ai_p, type_bc) 
-     END IF
-
-     IF ( ( PRESENT(knots)) ) THEN
-        CALL INITIALIZE_MESH_KNOTS_BSPLINES_1D(self, ai_n, ai_p, knots) 
-     END IF
-
      IF ( ( PRESENT(control_points)) ) THEN
         CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS(self, control_points) 
      ELSE
         CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self) 
      END IF
 
-     CALL CREATE_MESH_GRID_BSPLINES_1D(self) 
-
   END SUBROUTINE CREATE_MESH_BSPLINES_1D
   ! .........................................................
   
-  ! .........................................................
-  SUBROUTINE FREE_MESH_BSPLINES_1D(self)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     ! LOCAL
-     INTEGER :: li_err 
-
-     DEALLOCATE ( self % knots ) 
-
-  END SUBROUTINE FREE_MESH_BSPLINES_1D
-  ! .........................................................
-
-  ! .........................................................
-  subroutine INIT_MESH_1D_BSPLINE ( self, ai_type )
-  implicit none
-     TYPE(DEF_MESH_1D_BSPLINE), INTENT(INOUT) :: self
-     integer  :: ai_type
-  end subroutine INIT_MESH_1D_BSPLINE
-  ! .........................................................
-
-  ! .........................................................
-  subroutine convert_to_periodic_knots ( apr_knot, ai_N, ai_P, ai_nu, apr_t )
-  !> CONVERT A KNOT VECTOR INTO A PERIODIC KNOT (TO GET PERIODIC B-SPLINES) 
-  !> WITH THE POSSIBILITY OF CONTROLLING THE ORDER OF THE CONTINUITY
-  !> \todo NOT TESTED
-  implicit none
-    !> \param[in]
-    real(SPI_RK), dimension(:) :: apr_knot
-    !> \param[in]
-    integer  :: ai_N
-    !> \param[in]
-    integer  :: ai_P
-    !> \param[in]	Nbr OF CONITUITY CONDITIONS
-    integer  :: ai_nu	
-    !> \param[out] 
-    real(SPI_RK), dimension(:) :: apr_t	
-    ! LOCAL VARIABLES 
-    integer  :: li_i	
-    real(SPI_RK) :: lr_L !THE PERIOD
-    
-    lr_L = apr_knot ( ai_N + ai_P + 1 ) - apr_knot ( 1 )
-    
-    do li_i = 1 , ai_nu
-       apr_t ( li_i ) = apr_knot ( ai_N - ai_nu + li_i ) - lr_L
-    end do
-    
-    do li_i = ai_N + ai_P + 1 - ai_nu + 1 , ai_n + ai_P + 1
-       apr_t ( li_i ) = apr_knot ( li_i - ( ai_n + ai_P + 1 - ai_nu + 1 ) + ai_P + 2 ) + lr_L
-    end do
-  
-  end subroutine convert_to_periodic_knots
-  ! .........................................................
-
   ! .........................................................
 END MODULE SPI_MESH_BSPLINE 
