@@ -42,8 +42,8 @@ MODULE SPI_QUADRATURES
   IMPLICIT NONE
      CLASS(DEF_QUADRATURE_ABSTRACT) :: self
 
-     DEALLOCATE(self % opr_points )
-     DEALLOCATE(self % opr_weights)
+     DEALLOCATE(self % points )
+     DEALLOCATE(self % weights)
 
   END SUBROUTINE FREE_QUADRATURE
   ! .............................................

@@ -86,35 +86,6 @@ CONTAINS
   ! .........................................................
 
   ! .........................................................
-  SUBROUTINE CREATE_MESH_POINTS_1D(self, ao_quad)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_1D_BSPLINE)      , INTENT(INOUT) :: self
-     CLASS(DEF_QUADRATURE_ABSTRACT), TARGET , INTENT(INOUT) :: ao_quad 
-     ! LOCAL
-     INTEGER :: i_element
-     INTEGER :: li_ig 
-     REAL(SPI_RK) :: lr_a
-     REAL(SPI_RK) :: lr_b
-     REAL(SPI_RK) :: lr_x
-
-     self % ptr_quad => ao_quad
-
-     ALLOCATE(self % opr_points(self % n_elements, self % ptr_quad % oi_n_points))
-
-     DO i_element=1, self % n_elements 
-        lr_a = self % opr_grid(i_element)
-        lr_b = self % opr_grid(i_element+1)
-
-        DO li_ig = 1, self % ptr_quad % oi_n_points
-           lr_x = lr_a + self % ptr_quad % opr_points(li_ig) * (lr_b - lr_a )
-           self % opr_points(i_element, li_ig) = lr_x
-        END DO
-     END DO
-
-  END SUBROUTINE CREATE_MESH_POINTS_1D
-  ! .........................................................
-
-  ! .........................................................
   SUBROUTINE FREE_MESH(self)
   !     dirname is the directory where geometry files are given
   !     if not provided, then dirname is = $PWD

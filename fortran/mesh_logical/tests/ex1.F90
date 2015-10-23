@@ -46,10 +46,10 @@ implicit none
    PRINT *, ">>> grid"
    PRINT *, mesh_logical % grid
 
-!   PRINT *, ">>> points"
-!   DO e = 1, 4
-!      PRINT *, mesh_logical % points(e,:)
-!   END DO
+   PRINT *, ">>> points"
+   DO e = 1, 4
+      PRINT *, mesh_logical % points(e,:)
+   END DO
 
    CALL FREE_MESH_LOGICAL(mesh_logical) 
 end subroutine test1

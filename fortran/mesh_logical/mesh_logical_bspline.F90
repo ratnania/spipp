@@ -46,7 +46,7 @@ CONTAINS
 
      DEALLOCATE ( self % knots ) 
      DEALLOCATE ( self % grid) 
-!     DEALLOCATE ( self % points) 
+     DEALLOCATE ( self % points) 
 
   END SUBROUTINE FREE_MESH_LOGICAL_BSPLINE
   ! .........................................................

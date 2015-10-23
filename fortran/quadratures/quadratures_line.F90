@@ -27,8 +27,8 @@ MODULE SPI_QUADRATURES_LINE
 
      self % oi_n_points = li_size
 
-     ALLOCATE(self % opr_points (1:self % oi_n_points))
-     ALLOCATE(self % opr_weights(self % oi_n_points))
+     ALLOCATE(self % points (1:self % oi_n_points))
+     ALLOCATE(self % weights(self % oi_n_points))
 
      ALLOCATE(GL(li_size))
      ALLOCATE(W(li_size))
@@ -39,8 +39,8 @@ MODULE SPI_QUADRATURES_LINE
            CALL GaussJorek(ai_n,GL,W)
           
            DO li_i = 1, li_size 
-              self % opr_points (li_i) = GL(li_i) 
-              self % opr_weights(li_i) = W(li_i)
+              self % points (li_i) = GL(li_i) 
+              self % weights(li_i) = W(li_i)
            END DO
 
         ! ... LEGENDRE
@@ -48,8 +48,8 @@ MODULE SPI_QUADRATURES_LINE
            CALL GaussLegendre(ai_n,GL,W)
           
            DO li_i = 1, li_size 
-              self % opr_points (li_i) = 0.5 * (GL(li_i) + 1.0) 
-              self % opr_weights(li_i) = 0.5 * W(li_i)
+              self % points (li_i) = 0.5 * (GL(li_i) + 1.0) 
+              self % weights(li_i) = 0.5 * W(li_i)
            END DO
 
         ! ... LOBATTO
@@ -57,8 +57,8 @@ MODULE SPI_QUADRATURES_LINE
            CALL GaussLobatto(ai_n,GL,W)
           
            DO li_i = 1, li_size 
-              self % opr_points (li_i) = 0.5 * (GL(li_i) + 1.0) 
-              self % opr_weights(li_i) = 0.5 * W(li_i)
+              self % points (li_i) = 0.5 * (GL(li_i) + 1.0) 
+              self % weights(li_i) = 0.5 * W(li_i)
            END DO
 
         ! ... FOURIER. n_period IS EXPECTED 
@@ -71,8 +71,8 @@ MODULE SPI_QUADRATURES_LINE
            CALL FourierRule(ai_n, ai_n_period, GL,W)
           
            DO li_i = 1, li_size 
-              self % opr_points (li_i) = GL(li_i)
-              self % opr_weights(li_i) = W(li_i)
+              self % points (li_i) = GL(li_i)
+              self % weights(li_i) = W(li_i)
            END DO
 
         ! ... Default

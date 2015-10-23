@@ -23,10 +23,10 @@ implicit none
    CALL CREATE_QUADRATURE(lo_quad, SPI_QUADRATURES_LEGENDRE, K)
 
    PRINT *, ">>> points"
-   PRINT *, lo_quad % opr_points
+   PRINT *, lo_quad % points
 
    PRINT *, ">>> weights"
-   PRINT *, lo_quad % opr_weights
+   PRINT *, lo_quad % weights
 
    CALL FREE_QUADRATURE(lo_quad) 
 end subroutine test1
