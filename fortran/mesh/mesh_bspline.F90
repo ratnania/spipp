@@ -1,6 +1,8 @@
 !# -*- coding: utf8 -*-
 MODULE SPI_MESH_BSPLINE 
   USE SPI_MESH_DEF
+  USE SPI_MESH_LOGICAL_DEF
+  USE SPI_MESH_LOGICAL
   USE SPI_GLOBAL_DEF
   USE SPI_QUADRATURES_DEF
   IMPLICIT NONE
@@ -48,14 +50,29 @@ CONTAINS
      ALLOCATE(self % logicals(n_dim))
 
      IF ( ( PRESENT(logical_mesh_s1)) ) THEN
-        self % logicals(1) => logical_mesh_s1
+        self % logicals(1) % ptr_mesh => logical_mesh_s1
      END IF
      IF ( ( PRESENT(logical_mesh_s2)) ) THEN
-        self % logicals(2) => logical_mesh_s2
+        self % logicals(2) % ptr_mesh => logical_mesh_s2
      END IF
      IF ( ( PRESENT(logical_mesh_s3)) ) THEN
-        self % logicals(3) => logical_mesh_s3
+        self % logicals(3) % ptr_mesh => logical_mesh_s3
      END IF
+     ! ...
+
+     ! ...
+     SELECT TYPE (self)
+     CLASS IS (DEF_MESH_BSPLINE_1D)
+        CALL CREATE_MESH_BSPLINE_1D(self)
+     CLASS IS (DEF_MESH_BSPLINE_2D)
+        CALL CREATE_MESH_BSPLINE_2D(self)
+     CLASS IS (DEF_MESH_BSPLINE_3D)
+        CALL CREATE_MESH_BSPLINE_3D(self)
+     CLASS IS (DEF_MESH_BSPLINE_1D1D)
+        CALL CREATE_MESH_BSPLINE_1D1D(self)
+     CLASS DEFAULT
+        STOP 'CREATE_MESH_BSPLINE: unexpected type for self object!'
+     END SELECT
      ! ...
 
   END SUBROUTINE CREATE_MESH_BSPLINE
@@ -81,7 +98,7 @@ CONTAINS
      self % c_dim = 1
 
      ALLOCATE(self % control_points(self % c_dim))
-     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % n, self % d_dim))
+     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % ptr_mesh % n, self % d_dim))
 
   END SUBROUTINE CREATE_MESH_BSPLINE_1D
   ! .........................................................
@@ -96,8 +113,8 @@ CONTAINS
 
      ALLOCATE(self % control_points(self % c_dim))
      ALLOCATE(self % control_points(1) % coef( &
-                             &   self % logicals(1) % n &
-                             & , self % logicals(2) % n &
+                             &   self % logicals(1) % ptr_mesh % n &
+                             & , self % logicals(2) % ptr_mesh % n &
                              & , self % d_dim)) 
 
   END SUBROUTINE CREATE_MESH_BSPLINE_2D
@@ -113,9 +130,9 @@ CONTAINS
 
      ALLOCATE(self % control_points(self % c_dim))
      ALLOCATE(self % control_points(1) % coef( &
-                             &   self % logicals(1) % n &
-                             & , self % logicals(2) % n &
-                             & , self % logicals(3) % n &
+                             &   self % logicals(1) % ptr_mesh % n &
+                             & , self % logicals(2) % ptr_mesh % n &
+                             & , self % logicals(3) % ptr_mesh % n &
                              & , self % d_dim)) 
 
   END SUBROUTINE CREATE_MESH_BSPLINE_3D
@@ -130,8 +147,8 @@ CONTAINS
      self % c_dim = 2 
 
      ALLOCATE(self % control_points(self % c_dim))
-     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % n, self % d_dim))
-     ALLOCATE(self % control_points(2) % coef(self % logicals(2) % n, self % d_dim))
+     ALLOCATE(self % control_points(1) % coef(self % logicals(1) % ptr_mesh % n, self % d_dim))
+     ALLOCATE(self % control_points(2) % coef(self % logicals(2) % ptr_mesh % n, self % d_dim))
 
   END SUBROUTINE CREATE_MESH_BSPLINE_1D1D
   ! .........................................................
@@ -202,7 +219,7 @@ CONTAINS
      ! LOCAL
 
      ! ... control points
-     CALL  SET_MESH_BSPLINE_CONTROL_POINTS_1D(self, control_points, i_dimension=i_dimension)
+     self % control_points (i_dimension) % coef(:,:) = control_points(:,:) 
   END SUBROUTINE SET_MESH_BSPLINE_CONTROL_POINTS_1D1D
   ! .........................................................
 
@@ -288,27 +305,27 @@ CONTAINS
 
   END SUBROUTINE INITIALIZE_MESH_CONTROL_POINTS_DEFAULT_3D
   ! .........................................................
-
-  ! .........................................................
-  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, type_bc, knots, control_points)
-  IMPLICIT NONE
-     TYPE(DEF_MESH_BSPLINE_1D)      , INTENT(INOUT) :: self
-     INTEGER              , INTENT(IN)    :: ai_n
-     INTEGER              , INTENT(IN)    :: ai_p
-     INTEGER              , OPTIONAL, INTENT(IN)    :: type_bc
-     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: knots
-     real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points
-     ! LOCAL
-     INTEGER :: li_err 
-
-     IF ( ( PRESENT(control_points)) ) THEN
-        CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS(self, control_points) 
-     ELSE
-        CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self) 
-     END IF
-
-  END SUBROUTINE CREATE_MESH_BSPLINES_1D
-  ! .........................................................
+!
+!  ! .........................................................
+!  SUBROUTINE CREATE_MESH_BSPLINES_1D(self, ai_n, ai_p, type_bc, knots, control_points)
+!  IMPLICIT NONE
+!     TYPE(DEF_MESH_BSPLINE_1D)      , INTENT(INOUT) :: self
+!     INTEGER              , INTENT(IN)    :: ai_n
+!     INTEGER              , INTENT(IN)    :: ai_p
+!     INTEGER              , OPTIONAL, INTENT(IN)    :: type_bc
+!     real(SPI_RK), dimension (:), OPTIONAL, INTENT(IN) :: knots
+!     real(SPI_RK), dimension (:,:), OPTIONAL, INTENT(IN) :: control_points
+!     ! LOCAL
+!     INTEGER :: li_err 
+!
+!     IF ( ( PRESENT(control_points)) ) THEN
+!        CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS(self, control_points) 
+!     ELSE
+!        CALL INITIALIZE_MESH_1D_BSPLINE_CONTROL_POINTS_DEFAULT(self) 
+!     END IF
+!
+!  END SUBROUTINE CREATE_MESH_BSPLINES_1D
+!  ! .........................................................
   
   ! .........................................................
 END MODULE SPI_MESH_BSPLINE 

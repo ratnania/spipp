@@ -28,13 +28,19 @@ MODULE SPI_MESH_DEF
   ! .........................................................
 
   ! .........................................................
+  TYPE, PUBLIC :: DEF_MESH_LOGICAL_BSPLINE_POINTER
+     CLASS(DEF_MESH_LOGICAL_BSPLINE), POINTER :: ptr_mesh
+  END TYPE DEF_MESH_LOGICAL_BSPLINE_POINTER
+  ! .........................................................
+
+  ! .........................................................
   TYPE, ABSTRACT, PUBLIC :: DEF_MESH_BSPLINE_ABSTRACT
      INTEGER :: n_elements = 0
      INTEGER :: n_dim      = 0 
      INTEGER :: d_dim      = 0
      INTEGER :: c_dim      = 0
 
-     TYPE(DEF_MESH_LOGICAL_BSPLINE), DIMENSION(:), POINTER :: logicals
+     TYPE(DEF_MESH_LOGICAL_BSPLINE_POINTER), DIMENSION(:), ALLOCATABLE :: logicals
   END TYPE DEF_MESH_BSPLINE_ABSTRACT
   ! .........................................................
 
