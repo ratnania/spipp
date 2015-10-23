@@ -21,6 +21,12 @@ MODULE SPI_MESH_DEF
   ! .........................................................
   TYPE, ABSTRACT, PUBLIC :: DEF_MESH_ABSTRACT
      INTEGER :: n_elements
+  END TYPE DEF_MESH_ABSTRACT
+  ! .........................................................
+
+  ! .........................................................
+  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D_BSPLINE
+     INTEGER :: type_bc
 
      integer :: n 
      integer :: p
@@ -29,12 +35,6 @@ MODULE SPI_MESH_DEF
      REAL(SPI_RK), dimension (:), allocatable :: opr_grid
      REAL(SPI_RK), dimension (:,:), allocatable :: opr_points
      CLASS(DEF_QUADRATURE_ABSTRACT), POINTER :: ptr_quad => NULL()
-  END TYPE DEF_MESH_ABSTRACT
-  ! .........................................................
-
-  ! .........................................................
-  TYPE, PUBLIC, EXTENDS(DEF_MESH_ABSTRACT) :: DEF_MESH_1D_BSPLINE
-     INTEGER :: type_bc
 
      !> KNOT VECTOR FOR EACH DIRECTION
      real(SPI_RK), dimension (:), ALLOCATABLE :: knots

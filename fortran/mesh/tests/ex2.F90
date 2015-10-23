@@ -34,6 +34,9 @@ implicit none
    INTEGER, PARAMETER :: K_u = 3 
    INTEGER, PARAMETER :: K_v = 2 
    INTEGER :: i 
+   INTEGER :: j 
+   INTEGER, PARAMETER :: N_DIM = 1 
+   REAL(SPI_RK), DIMENSION(N_u, N_v, N_DIM) :: control_points_2d 
 
    KNOTS_u(1:P_u+1) = 0.0
    DO i =1, N_u - P_u - 1 
@@ -45,16 +48,25 @@ implicit none
       KNOTS_v(i+P_v+1) = i * 1.0 / (N_v-P_v) 
    END DO
 
+   ! ... control points
+   control_points_2d = 0.0
+   do i = 1, N_u 
+      do j = 1, N_v 
+         control_points_2d( i, j, : ) = (i - 1) * (j - 1) * 1.0d0 / ( (N_u - 1) * (N_v - 1)) 
+      end do 
+   end do 
+   ! ...
+
    CALL CREATE_QUADRATURE(quad_u, SPI_QUADRATURES_LEGENDRE, K_u)
    CALL CREATE_QUADRATURE(quad_v, SPI_QUADRATURES_LEGENDRE, K_v)
-   CALL CREATE_MESH(mesh % mesh_u, quad_u=quad_u, n_u=N_u, p_u=P_u, knots_u=KNOTS_u) 
-   CALL CREATE_MESH(mesh % mesh_v, quad_u=quad_v, n_u=N_v, p_u=P_v, knots_u=KNOTS_v) 
+   CALL CREATE_MESH(mesh &
+           & , quad_u=quad_u, n_u=N_u, p_u=P_u, knots_u=KNOTS_u &
+           & , quad_v=quad_v, n_v=N_v, p_v=P_v, knots_v=KNOTS_v) 
 
    PRINT *, ">>> N_u, P_u :", mesh % mesh_u % n, mesh % mesh_u % p
    PRINT *, ">>> N_v, P_v :", mesh % mesh_v % n, mesh % mesh_v % p
 
-   CALL FREE_MESH(mesh % mesh_u) 
-   CALL FREE_MESH(mesh % mesh_v) 
+   CALL FREE_MESH(mesh) 
 end subroutine test1
 ! ............................................
    

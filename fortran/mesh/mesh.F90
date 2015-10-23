@@ -54,6 +54,29 @@ CONTAINS
                    & )
            CALL CREATE_MESH_POINTS_1D(self, quad_u) 
         END IF
+     CLASS IS (DEF_MESH_2D_BSPLINE)
+        IF ((PRESENT(n_u)) .AND. (PRESENT(p_u)) .AND. (PRESENT(quad_u)) &
+    & .AND. (PRESENT(n_v)) .AND. (PRESENT(p_v)) .AND. (PRESENT(quad_v))) THEN
+           ! ... u direction
+           CALL CREATE_MESH_BSPLINES_1D(self % mesh_u, &
+                   & n_u, &
+                   & p_u, & 
+                   & type_bc=type_bc_u, &
+                   & knots=knots_u &
+                   & )
+           CALL CREATE_MESH_POINTS_1D(self % mesh_u, quad_u) 
+           ! ...
+
+           ! ... u direction
+           CALL CREATE_MESH_BSPLINES_1D(self % mesh_v, &
+                   & n_v, &
+                   & p_v, & 
+                   & type_bc=type_bc_v, &
+                   & knots=knots_v &
+                   & )
+           CALL CREATE_MESH_POINTS_1D(self % mesh_v, quad_v) 
+           ! ...
+        END IF
 
      CLASS DEFAULT
         STOP 'CREATE_MESH: unexpected type for self object!'
@@ -99,11 +122,16 @@ CONTAINS
      CLASS(DEF_MESH_ABSTRACT)       , INTENT(INOUT) :: self 
      ! LOCAL
 
-     DEALLOCATE ( self % opr_grid) 
 
      SELECT TYPE (self)
      CLASS IS (DEF_MESH_1D_BSPLINE)
+        DEALLOCATE ( self % opr_grid) 
         CALL FREE_MESH_BSPLINES_1D(self)
+     CLASS IS (DEF_MESH_2D_BSPLINE)
+        DEALLOCATE ( self % mesh_u % opr_grid) 
+        DEALLOCATE ( self % mesh_v % opr_grid) 
+        CALL FREE_MESH_BSPLINES_1D(self % mesh_u)
+        CALL FREE_MESH_BSPLINES_1D(self % mesh_v)
 
      CLASS DEFAULT
         STOP 'FREE_MESH: unexpected type for self object!'
